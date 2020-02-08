@@ -16,6 +16,7 @@ namespace Valuation.WorldTradingData.Service
         }
         public Task DownloadEndOfDayPrices()
         {
+            var listings = listingService.GetActiveListing();
             throw new NotImplementedException();
         }
     }
