@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LanguageExt;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,12 +9,18 @@ namespace Valuation.Service
 {
     public interface IListingService
     {
-        IAsyncEnumerable<Listing> GetActiveListing();
+        Task<IEnumerable<Tuple<Listing, Option<DateTime>>>> GetActiveListingWithLastEodPriceDateTime();
+        Task<IEnumerable<Listing>> GetActiveListing();
     }
 
     public class ListingService : IListingService
     {
-        public IAsyncEnumerable<Listing> GetActiveListing()
+        public Task<IEnumerable<Listing>> GetActiveListing()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Tuple<Listing, Option<DateTime>>>> GetActiveListingWithLastEodPriceDateTime()
         {
             throw new NotImplementedException();
         }

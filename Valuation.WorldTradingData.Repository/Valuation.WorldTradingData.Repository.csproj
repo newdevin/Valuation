@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Valuation.WorldTradingData.Service\Valuation.WorldTradingData.Service.csproj" />
+  </ItemGroup>
+
 </Project>
