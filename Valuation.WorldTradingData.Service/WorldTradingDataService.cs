@@ -20,8 +20,8 @@ namespace Valuation.WorldTradingData.Service
         public Uri GetEndOfDayPriceUri(Option<DateTime> dateTime, string symbol)
         {
             return dateTime.Match(dt =>
-            new Uri($"{baseUri}/api.v1/history?output=csv&api_token={token}&symbol={symbol}&date_from={dt.ToString("YYYY-MM-DD")}"),
-             () => new Uri($"{baseUri}/api.v1/history?output=csv&api_token={token}&symbol={symbol}"));
+            new Uri($"{baseUri}api.v1/history?output=csv&api_token={token}&symbol={symbol}&date_from={dt.ToString("yyyy-MM-dd")}"),
+             () => new Uri($"{baseUri}api.v1/history?output=csv&api_token={token}&symbol={symbol}"));
 
         }
     }

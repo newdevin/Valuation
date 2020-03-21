@@ -36,7 +36,7 @@ namespace Valuation.WorldTradingData.Service
                     await endOfDayRepository.Save(endOfDayPrices);
                 });
             });
-            await Task.WhenAll();
+            await Task.WhenAll(task);
         }
 
         private async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPrice(int listingId, Uri uri)
@@ -49,17 +49,39 @@ namespace Valuation.WorldTradingData.Service
             {
                 var data = await response.Content.ReadAsStringAsync();
                 //Date,Open,Close,High,Low,Volume
-                var allLines = data.Split(Environment.NewLine);
+                var allLines = data.Split("\n");
                 var dataLines = allLines.Skip(1);
                 return dataLines.Select(d =>
                 {
                     var p = d.Split(',', StringSplitOptions.None);
+                    decimal? openPrice = null;
+                    decimal? closePrice = null;
+                    decimal? highPrice = null;
+                    decimal? lowPrice = null;
+                    int? volume = null;
                     DateTime.TryParse(p[0], out DateTime day);
-                    decimal.TryParse(p[1], out decimal openPrice);
-                    decimal.TryParse(p[2], out decimal closePrice);
-                    decimal.TryParse(p[3], out decimal highPrice);
-                    decimal.TryParse(p[4], out decimal lowPrice);
-                    int.TryParse(p[5], out int volume);
+
+                    if (decimal.TryParse(p[1], out decimal price))
+                    {
+                        openPrice = price;
+                    }
+                    if (decimal.TryParse(p[2], out price))
+                    {
+                        closePrice = price;
+                    }
+                    if (decimal.TryParse(p[3], out price))
+                    {
+                        highPrice = price;
+                    }
+                    if (decimal.TryParse(p[4], out price))
+                    {
+                        closePrice = price;
+                    }
+
+                    if (int.TryParse(p[5], out int vol))
+                    {
+                        volume = vol;
+                    }
 
                     return EndOfDayPrice.Create(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
                 });
