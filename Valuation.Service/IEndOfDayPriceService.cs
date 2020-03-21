@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Valuation.Service
 {
-    public interface IEndOfDayService
+    public interface IEndOfDayPriceService
     {
         Task DownloadEndOfDayPrices(DateTime endOfDay);
     }

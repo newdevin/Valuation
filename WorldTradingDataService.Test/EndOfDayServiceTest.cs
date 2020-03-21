@@ -18,7 +18,7 @@ namespace WorldTradingData.Service.Test
 {
     public class EndOfDayServiceTest
     {
-        EndOfDayService endOfDayService;
+        EndOfDayPriceService endOfDayService;
         IWorldTradingDataService worldTradingDataService;
         IEndOfDayRepository endOfDayRepository;
         IListingService listingService;
@@ -30,7 +30,7 @@ namespace WorldTradingData.Service.Test
             listingService = Substitute.For<IListingService>();
             httpClientFactory = Substitute.For<IHttpClientFactory>();
 
-            endOfDayService = new EndOfDayService(worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
+            endOfDayService = new EndOfDayPriceService(worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
         }
 
         private IEnumerable<Listing> GetListings()

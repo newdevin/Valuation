@@ -8,14 +8,14 @@ using Valuation.Domain;
 
 namespace Valuation.WorldTradingData.Service
 {
-    public class EndOfDayService : IEndOfDayService
+    public class EndOfDayPriceService : IEndOfDayPriceService
     {
         private readonly IWorldTradingDataService worldTradingDataService;
         private readonly IEndOfDayRepository endOfDayRepository;
         private readonly IListingService listingService;
         private readonly IHttpClientFactory httpClientFactory;
 
-        public EndOfDayService(IWorldTradingDataService worldTradingDataService,
+        public EndOfDayPriceService(IWorldTradingDataService worldTradingDataService,
             IEndOfDayRepository endOfDayRepository, IListingService listingService, IHttpClientFactory httpClientFactory)
         {
             this.worldTradingDataService = worldTradingDataService;
