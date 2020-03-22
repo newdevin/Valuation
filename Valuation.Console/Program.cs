@@ -29,6 +29,7 @@ namespace Valuation.Console
                 services.AddHostedService<Worker>();
                 services.AddAutoMapper(typeof(Worker));
                 var conStr = hostContext.Configuration.GetConnectionString("PicassoDbConnectionString");
+                var uriString = hostContext.Configuration["WorldTradingDataUri"];
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr));
                 
                 services.AddTransient<IEndOfDayRepository, EndOfDayRepository>( s => 
@@ -36,10 +37,15 @@ namespace Valuation.Console
                 services.AddTransient<IListingRepository, ListingRepository>(s => 
                     new ListingRepository(s.GetService<PicassoDbContext>(), s.GetService<IObjectMapper>()));
 
+                services.AddTransient<IWorldTradingDataRepository, WorldTradingDataRepository>(s =>
+                 new WorldTradingDataRepository(s.GetService<PicassoDbContext>()));
+
+
                 services.AddHttpClient();
                 services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
                 services.AddTransient<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
-                services.AddTransient<IWorldTradingDataService, WorldTradingDataService>();
+                services.AddTransient<IWorldTradingDataService, WorldTradingDataService>(s => 
+                new WorldTradingDataService(new System.Uri(uriString), s.GetService<IWorldTradingDataRepository>()));
                 services.AddTransient<IListingService, ListingService>();
 
             });

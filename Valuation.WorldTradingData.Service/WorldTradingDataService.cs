@@ -13,14 +13,13 @@ namespace Valuation.WorldTradingData.Service
         public WorldTradingDataService(Uri baseUri, IWorldTradingDataRepository worldTradingDataRepository)
         {
             this.baseUri = baseUri;
-            this.worldTradingDataRepository = worldTradingDataRepository; 
+            this.worldTradingDataRepository = worldTradingDataRepository;
+            token = worldTradingDataRepository.GetToken();
         }
 
         public Uri GetEndOfDayPriceUri(DateTime? dateTime, string symbol)
         {
-            if (token == null)
-                token = worldTradingDataRepository.GetToken();
-
+            
             if (dateTime.HasValue)
                 return new Uri($"{baseUri}api.v1/history?output=csv&api_token={token}&symbol={symbol}&date_from={dateTime.Value.ToString("yyyy-MM-dd")}");
             else

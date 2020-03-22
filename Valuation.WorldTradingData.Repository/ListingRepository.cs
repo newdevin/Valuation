@@ -25,12 +25,14 @@ namespace Valuation.WorldTradingData.Repository
         public async Task<IEnumerable<Listing>> GetActiveListing()
         {
 
-            var allListingEntities = context.ListingVolumes;
+            var allListingEntities = context.ListingVolumes
+                .Include(lv=> lv.Listing);
+
             var activeListingsEntities = await context.ListingVolumes
                                     .Where(lv => lv.Day == allListingEntities.Where(al => al.Listing.Id == lv.Listing.Id).Max(al => al.Day) && lv.Quantity > 0)
                                     .Select(lv => lv.Listing)
                                     .ToListAsync() ;
-            var activeListings = mapper.MapTo<ListingEntity, Listing>(activeListingsEntities).ToList();
+            var activeListings = activeListingsEntities.Select (activeListingsEntity =>  mapper.MapTo<ListingEntity, Listing>(activeListingsEntity)).ToList();
             return activeListings;
 
 

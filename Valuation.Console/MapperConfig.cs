@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using LanguageExt;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Valuation.Domain;
 using Valuation.WorldTradingData.Repository.Entities;
@@ -30,35 +30,39 @@ namespace Valuation.Console
 
         private void MapEndOfDayPrice()
         {
-            CreateMap<EndOfDayPriceEntity, Option<EndOfDayPrice>>()
+            CreateMap<EndOfDayPriceEntity, EndOfDayPrice>()
                 .ConstructUsing((entity, ctx) => new EndOfDayPrice(entity.Listing.Id, entity.Day, entity.Open, entity.Close, entity.High, entity.Low, entity.Volume))
                 .ReverseMap();
         }
 
         private void MapListing()
         {
-            CreateMap<ListingEntity, Option<Listing>>()
+            CreateMap<ListingEntity, Listing>()
                 .ConstructUsing((entity, ctx) => new Listing(entity.Id, ctx.Mapper.Map<Company>(entity.Company), ctx.Mapper.Map<Exchange>(entity.Exchange), ctx.Mapper.Map<Currency>(entity.Currency), entity.Symbol, entity.Suffix))
+                .ReverseMap();
+
+            CreateMap<IEnumerable<ListingEntity>, IEnumerable<Listing>>()
+                .ConstructUsing((entities, ctx) =>  entities.Select(entity=> new Listing(entity.Id, ctx.Mapper.Map<Company>(entity.Company), ctx.Mapper.Map<Exchange>(entity.Exchange), ctx.Mapper.Map<Currency>(entity.Currency), entity.Symbol, entity.Suffix)))
                 .ReverseMap();
         }
 
         private void MapCompany()
         {
-            CreateMap<CompanyEntity, Option<Company>>()
+            CreateMap<CompanyEntity, Company>()
                 .ConstructUsing(entity => new Company(entity.Id, entity.Name, entity.AdditionalInformation))
                 .ReverseMap();
         }
 
         private void MapExchange()
         {
-            CreateMap<ExchangeEntity, Option<Exchange>>()
+            CreateMap<ExchangeEntity, Exchange>()
                             .ConstructUsing(entity => new Exchange(entity.Symbol))
                             .ReverseMap();
         }
 
         private void MapCurrency()
         {
-            CreateMap<CurrencyEntity, Option<Currency>>()
+            CreateMap<CurrencyEntity, Currency>()
                             .ConstructUsing(entity => new Currency(entity.Symbol))
                             .ReverseMap();
         }

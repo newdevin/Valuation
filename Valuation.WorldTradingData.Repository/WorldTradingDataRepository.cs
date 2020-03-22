@@ -16,7 +16,7 @@ namespace Valuation.WorldTradingData.Repository
         }
         public string GetToken()
         {
-            return context.ApiProviders.First(a => a.Name == "WorldTradingData").Key;
+            return context.ApiProviders.First(a => a.Name == "WorldTradingData").ApiKey;
         }
     }
 }
