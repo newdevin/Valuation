@@ -1,5 +1,4 @@
-﻿using LanguageExt;
-using static LanguageExt.Prelude;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,9 +8,11 @@ namespace Valuation.Domain
     public class Listing
     {
        
-        private Listing(int id, Company company, Exchange exchange, Currency currency, string symbol, string suffix)
+        public Listing(int id, Company company, Exchange exchange, Currency currency, string symbol, string suffix)
         {
-            Id = id;
+            if (string.IsNullOrWhiteSpace(symbol))
+                throw new ArgumentException(symbol);
+                Id = id;
             Company = company;
             Exchange = exchange;
             Currency = currency;
@@ -26,12 +27,5 @@ namespace Valuation.Domain
         public string Symbol { get; }
         public string Suffix { get; }
 
-        public static Option<Listing> Create(int id, Company company, Exchange exchange, Currency currency, string symbol, string suffix)
-        {
-            if (string.IsNullOrWhiteSpace(symbol))
-                return None;
-            else
-                return new Listing(id, company, exchange, currency, symbol, suffix);
-        }
     }
 }

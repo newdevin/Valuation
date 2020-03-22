@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Valuation.Domain;
@@ -22,9 +23,8 @@ namespace Valuation.WorldTradingData.Repository
         public async Task Save(IEnumerable<EndOfDayPrice> endOfDayPrices)
         {
             var entities = mapper.MapTo<EndOfDayPrice, EndOfDayPriceEntity>(endOfDayPrices);
-            context.endOfDayPrices.AddRange(entities);
+            context.EndOfDayPrices.AddRange(entities);
             await context.SaveChangesAsync();
-
         }
     }
 }

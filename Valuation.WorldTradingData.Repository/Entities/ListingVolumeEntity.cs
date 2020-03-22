@@ -5,16 +5,12 @@ using System.Text;
 
 namespace Valuation.WorldTradingData.Repository.Entities
 {
-    [Table("EndOfDayPrice")]
-    public class EndOfDayPriceEntity
+    [Table("ListingVolume")]
+    public class ListingVolumeEntity
     {
         public int Id { get; set; }
         public ListingEntity Listing { get; set; }
+        public int Quantity { get; set; }
         public DateTime Day { get; set; }
-        public decimal? Open { get; set; }
-        public decimal? Close { get; set; }
-        public decimal? High { get; set; }
-        public decimal? Low { get; set; }
-        public int? Volume { get; set; }
     }
 }

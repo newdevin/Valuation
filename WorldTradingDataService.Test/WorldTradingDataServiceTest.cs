@@ -1,3 +1,4 @@
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,21 @@ namespace WorldTradingData.Service.Test
         WorldTradingDataService worldTradingDataService;
         public const string Base_Uri = @"https://api.worldtradingdata.com";
         public const string Token = "LM0o123Ret";
+        IWorldTradingDataRepository worldTradingDataRepository;
         public WorldTradingDataServiceTest()
         {
-            worldTradingDataService = new WorldTradingDataService(new Uri(Base_Uri), Token);
+            worldTradingDataRepository = Substitute.For<IWorldTradingDataRepository>();
+            worldTradingDataRepository.GetToken().Returns(Token);
+            worldTradingDataService = new WorldTradingDataService(new Uri(Base_Uri), worldTradingDataRepository);
         }
 
         [Fact]
         public void ShouldReturnCorrectUriWhenDateIsNotSpecified()
         {
+            
+
             string symbol = "ABC";
-            var uri = worldTradingDataService.GetEndOfDayPriceUri(None, symbol);
+            var uri = worldTradingDataService.GetEndOfDayPriceUri(null, symbol);
             
             var query = uri.Query.Replace("?","");
             Assert.NotNull(query);
@@ -45,7 +51,7 @@ namespace WorldTradingData.Service.Test
         {
             string symbol = "ABC";
             var dateString = "2020-03-01";
-            var uri = worldTradingDataService.GetEndOfDayPriceUri(Some(DateTime.Parse(dateString)), symbol);
+            var uri = worldTradingDataService.GetEndOfDayPriceUri(DateTime.Parse(dateString), symbol);
 
             var query = uri.Query.Replace("?", "");
             Assert.NotNull(query);

@@ -1,23 +1,18 @@
-﻿using LanguageExt;
-using static LanguageExt.Prelude;
+﻿
+using System;
 
 namespace Valuation.Domain
 {
     public class Company
     {
-        private Company(int id, string name, string additionalInformation)
+        public Company(int id, string name, string additionalInformation)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException($"{nameof(name)} is required");
+
             Id = id;
             Name = name;
             AdditionalInformation = additionalInformation;
-        }
-
-        public static Option<Company> Create(int id, string name, string additionalInformation)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return None;
-            else
-                return new Company(id, name, additionalInformation);
         }
 
         public int Id { get; }

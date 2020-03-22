@@ -17,8 +17,9 @@ namespace Valuation.WorldTradingData.Repository
         public DbSet<CurrencyEntity> Currencies { get; set; }
         public DbSet<ExchangeEntity> Exchanges { get; set; }
         public DbSet<ListingEntity> Listings { get; set; }
-        public DbSet<EndOfDayPriceEntity> endOfDayPrices { get; set; }
-
+        public DbSet<EndOfDayPriceEntity> EndOfDayPrices { get; set; }
+        public DbSet<ListingVolumeEntity> ListingVolumes { get; set; }
+        public DbSet<ApiProdiverEntity> ApiProviders { get; set; }
 
     }
 }

@@ -26,9 +26,5 @@ namespace Valuation.Domain
         public decimal? LowPrice { get; }
         public int? Volume { get; }
 
-        public static EndOfDayPrice Create(int listingId, DateTime day, decimal? openPrice, decimal? closePrice, decimal? highPrice, decimal? lowPrice, int? volume)
-        {
-            return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
-        }
     }
 }

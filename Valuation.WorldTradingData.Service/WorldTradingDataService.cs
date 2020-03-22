@@ -1,27 +1,31 @@
-﻿using LanguageExt;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Valuation.WorldTradingData.Service
 {
-
     public class WorldTradingDataService : IWorldTradingDataService
     {
         private readonly Uri baseUri;
-        private readonly string token;
+        private readonly IWorldTradingDataRepository worldTradingDataRepository;
+        private string token;
 
-        public WorldTradingDataService(Uri baseUri, string token)
+        public WorldTradingDataService(Uri baseUri, IWorldTradingDataRepository worldTradingDataRepository)
         {
             this.baseUri = baseUri;
-            this.token = token;
+            this.worldTradingDataRepository = worldTradingDataRepository; 
         }
 
-        public Uri GetEndOfDayPriceUri(Option<DateTime> dateTime, string symbol)
+        public Uri GetEndOfDayPriceUri(DateTime? dateTime, string symbol)
         {
-            return dateTime.Match(dt =>
-            new Uri($"{baseUri}api.v1/history?output=csv&api_token={token}&symbol={symbol}&date_from={dt.ToString("yyyy-MM-dd")}"),
-             () => new Uri($"{baseUri}api.v1/history?output=csv&api_token={token}&symbol={symbol}"));
+            if (token == null)
+                token = worldTradingDataRepository.GetToken();
+
+            if (dateTime.HasValue)
+                return new Uri($"{baseUri}api.v1/history?output=csv&api_token={token}&symbol={symbol}&date_from={dateTime.Value.ToString("yyyy-MM-dd")}");
+            else
+                return new Uri($"{baseUri}api.v1/history?output=csv&api_token={token}&symbol={symbol}");
+            
 
         }
     }

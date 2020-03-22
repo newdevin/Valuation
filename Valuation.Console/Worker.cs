@@ -5,39 +5,43 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Valuation.Service;
 
 namespace Valuation.Console
 {
     public class Worker : IHostedService
     {
-        public Worker(ILogger<Worker> logger)
+        private readonly IEndOfDayPriceService endOfDayPriceService;
+        private readonly ILogger<Worker> logger;
+
+        public Worker(ILogger<Worker> logger, IEndOfDayPriceService endOfDayPriceService)
         {
-            Logger = logger;
+            this.logger = logger;
+            this.endOfDayPriceService = endOfDayPriceService;
         }
 
-        public ILogger<Worker> Logger { get; }
         private CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
         private TaskCompletionSource<bool> TaskCompletionSource { get; } = new TaskCompletionSource<bool>();
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            Logger.LogInformation("starting");
-            Task.Run(()=> DoWork(cancellationToken));
-            return TaskCompletionSource.Task;
+            logger.LogInformation("starting");
+            await DoWork(cancellationToken);
         }
 
-        private void DoWork(CancellationToken token)
+        private async Task DoWork(CancellationToken token)
         {
             System.Console.WriteLine("Hello World!");
-            
+            if (!token.IsCancellationRequested)
+                await endOfDayPriceService.DownloadEndOfDayPrices(DateTime.Now.Date);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             CancellationTokenSource.Cancel();
-            Logger.LogInformation("stopping");
+            logger.LogInformation("stopping");
             return TaskCompletionSource.Task;
-            
+
         }
     }
 }

@@ -83,7 +83,7 @@ namespace Valuation.WorldTradingData.Service
                         volume = vol;
                     }
 
-                    return EndOfDayPrice.Create(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
+                    return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
                 });
             }
             return Array.Empty<EndOfDayPrice>();

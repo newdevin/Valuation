@@ -35,12 +35,12 @@ namespace WorldTradingData.Service.Test
 
         private IEnumerable<Listing> GetListings()
         {
-            var listing = Company.Create(1, "SNAP", "Dummy company")
-            .Bind(company => Exchange.Create("NYSE")
-            .Bind(exchange => Currency.Create("USD")
-            .Bind(currency => Listing.Create(1, company, exchange, currency, "SNAP", ""))));
+            var company = new Company(1, "SNAP", "Dummy company");
+            var exchange = new Exchange("NYSE");
+            var currency = new Currency("USD");
+            var listing = new Listing(1, company, exchange, currency, "SNAP", "");
 
-            return listing.Match(l => new List<Listing> { l }, new List<Listing>());
+            return new List<Listing> { listing };
 
         }
 
@@ -58,7 +58,7 @@ namespace WorldTradingData.Service.Test
             
             httpClientFactory.CreateClient().Returns(fakeHttpClient);
             listingService.GetActiveListing().Returns(GetListings());
-            worldTradingDataService.GetEndOfDayPriceUri(Arg.Any<Option<DateTime>>(), Arg.Any<string>())
+            worldTradingDataService.GetEndOfDayPriceUri(Arg.Any<DateTime>(), Arg.Any<string>())
                 .Returns(new Uri("http://someuri"));
 
             await endOfDayService.DownloadEndOfDayPrices(DateTime.Now);
