@@ -10,6 +10,7 @@ namespace Valuation.WorldTradingData.Repository.Entities
     {
         public int Id { get; set; }
         public ListingEntity Listing { get; set; }
+        public int ListingId { get; set; }
         public DateTime Day { get; set; }
         public decimal? Open { get; set; }
         public decimal? Close { get; set; }

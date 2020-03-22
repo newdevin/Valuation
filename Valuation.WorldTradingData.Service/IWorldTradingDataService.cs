@@ -5,6 +5,6 @@ namespace Valuation.WorldTradingData.Service
 {
     public interface IWorldTradingDataService
     {
-        public Uri GetEndOfDayPriceUri(DateTime? dateTime, string symbol);
+        public Uri GetEndOfDayPriceUri(DateTime? dateTime, string symbol, string suffix);
     }
 }

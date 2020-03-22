@@ -33,14 +33,14 @@ namespace WorldTradingData.Service.Test
             endOfDayService = new EndOfDayPriceService(worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
         }
 
-        private IEnumerable<Listing> GetListings()
+        private IEnumerable<Tuple<Listing, DateTime?>> GetListings()
         {
             var company = new Company(1, "SNAP", "Dummy company");
             var exchange = new Exchange("NYSE");
             var currency = new Currency("USD");
             var listing = new Listing(1, company, exchange, currency, "SNAP", "");
 
-            return new List<Listing> { listing };
+            return new List<Tuple<Listing, DateTime?>> { Tuple.Create(listing,(DateTime?) new DateTime(2020, 03, 21)) };
 
         }
 
@@ -55,10 +55,10 @@ namespace WorldTradingData.Service.Test
                 Content = new StringContent(File.ReadAllText(path))
             });
             var fakeHttpClient = new HttpClient(fakeHttpMessageHandler);
-            
+
             httpClientFactory.CreateClient().Returns(fakeHttpClient);
-            listingService.GetActiveListing().Returns(GetListings());
-            worldTradingDataService.GetEndOfDayPriceUri(Arg.Any<DateTime>(), Arg.Any<string>())
+            listingService.GetActiveListingWithLastEodPriceDateTime().Returns(GetListings());
+            worldTradingDataService.GetEndOfDayPriceUri(Arg.Any<DateTime>(), Arg.Any<string>(), Arg.Any<string>())
                 .Returns(new Uri("http://someuri"));
 
             await endOfDayService.DownloadEndOfDayPrices(DateTime.Now);

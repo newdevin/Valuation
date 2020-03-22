@@ -22,7 +22,16 @@ namespace Valuation.WorldTradingData.Repository
         }
         public async Task Save(IEnumerable<EndOfDayPrice> endOfDayPrices)
         {
-            var entities = endOfDayPrices.Select(endOfDayPrice => mapper.MapTo<EndOfDayPrice, EndOfDayPriceEntity>(endOfDayPrice));
+
+            foreach (var eodPrice in endOfDayPrices)
+            {
+                var e = context.EndOfDayPrices.Where(eod => eod.Listing.Id == eodPrice.ListingId && eod.Day == eodPrice.Day).ToList();
+                context.EndOfDayPrices.RemoveRange(e);
+            }
+            await context.SaveChangesAsync();
+            var entities = endOfDayPrices
+                .Select(endOfDayPrice => mapper.MapTo<EndOfDayPrice, EndOfDayPriceEntity>(endOfDayPrice))
+                .ToList();
             context.EndOfDayPrices.AddRange(entities);
             await context.SaveChangesAsync();
         }

@@ -32,7 +32,8 @@ namespace Valuation.Console
         {
             CreateMap<EndOfDayPriceEntity, EndOfDayPrice>()
                 .ConstructUsing((entity, ctx) => new EndOfDayPrice(entity.Listing.Id, entity.Day, entity.Open, entity.Close, entity.High, entity.Low, entity.Volume))
-                .ReverseMap();
+                .ReverseMap()
+                .ConvertUsing(model => new EndOfDayPriceEntity { ListingId = model.ListingId, Day = model.Day, Open = model.OpenPrice, Close = model.ClosePrice, High = model.HighPrice, Low = model.LowPrice, Volume = model.Volume });
         }
 
         private void MapListing()

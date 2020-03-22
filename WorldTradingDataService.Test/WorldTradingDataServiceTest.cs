@@ -27,7 +27,7 @@ namespace WorldTradingData.Service.Test
             
 
             string symbol = "ABC";
-            var uri = worldTradingDataService.GetEndOfDayPriceUri(null, symbol);
+            var uri = worldTradingDataService.GetEndOfDayPriceUri(null, symbol, null);
             
             var query = uri.Query.Replace("?","");
             Assert.NotNull(query);
@@ -51,7 +51,7 @@ namespace WorldTradingData.Service.Test
         {
             string symbol = "ABC";
             var dateString = "2020-03-01";
-            var uri = worldTradingDataService.GetEndOfDayPriceUri(DateTime.Parse(dateString), symbol);
+            var uri = worldTradingDataService.GetEndOfDayPriceUri(DateTime.Parse(dateString), symbol, null);
 
             var query = uri.Query.Replace("?", "");
             Assert.NotNull(query);

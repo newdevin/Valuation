@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using Valuation.Domain;
+using System.Collections.Concurrent;
 
 namespace Valuation.WorldTradingData.Service
 {
@@ -25,18 +26,22 @@ namespace Valuation.WorldTradingData.Service
         }
         public async Task DownloadEndOfDayPrices(DateTime endOfDay)
         {
-            var listings = await listingService.GetActiveListing();
-
-            var task = listings.Select(listing =>
+            var listingsWithDate = await listingService.GetActiveListingWithLastEodPriceDateTime();
+            var queue = new ConcurrentQueue<EndOfDayPrice>();
+            var task = listingsWithDate.Select(listingWithDate =>
             {
                 return Task.Run(async () =>
                 {
-                    var uri = worldTradingDataService.GetEndOfDayPriceUri(endOfDay, listing.Symbol);
-                    var endOfDayPrices = await GetEndOfDayPrice(listing.Id, uri);
-                    await endOfDayRepository.Save(endOfDayPrices);
+                    var uri = worldTradingDataService.GetEndOfDayPriceUri(listingWithDate.Item2?.AddDays(1), listingWithDate.Item1.Symbol, listingWithDate.Item1.Suffix);
+                    var endOfDayPrices = await GetEndOfDayPrice(listingWithDate.Item1.Id, uri);
+                    foreach (var eodPrice in endOfDayPrices)
+                    {
+                        queue.Enqueue(eodPrice);
+                    }
                 });
             });
             await Task.WhenAll(task);
+            await endOfDayRepository.Save(queue.Select(eodPrice => eodPrice));
         }
 
         private async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPrice(int listingId, Uri uri)
@@ -51,7 +56,9 @@ namespace Valuation.WorldTradingData.Service
                 //Date,Open,Close,High,Low,Volume
                 var allLines = data.Split("\n");
                 var dataLines = allLines.Skip(1);
-                return dataLines.Select(d =>
+                return dataLines
+                    .Where(d => !string.IsNullOrWhiteSpace(d))
+                    .Select(d =>
                 {
                     var p = d.Split(',', StringSplitOptions.None);
                     decimal? openPrice = null;
@@ -75,7 +82,7 @@ namespace Valuation.WorldTradingData.Service
                     }
                     if (decimal.TryParse(p[4], out price))
                     {
-                        closePrice = price;
+                        lowPrice = price;
                     }
 
                     if (int.TryParse(p[5], out int vol))

@@ -10,8 +10,7 @@ namespace Valuation.Service
 {
     public interface IListingService
     {
-        Task<IEnumerable<Tuple<Listing, Option<DateTime>>>> GetActiveListingWithLastEodPriceDateTime();
-        Task<IEnumerable<Listing>> GetActiveListing();
+        Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastEodPriceDateTime();
     }
 
     public class ListingService : IListingService
@@ -22,14 +21,10 @@ namespace Valuation.Service
         {
             this.listingRepository = listingRepository;
         }
-        public Task<IEnumerable<Listing>> GetActiveListing()
+        public Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastEodPriceDateTime()
         {
-            return listingRepository.GetActiveListing();
+            return listingRepository.GetActiveListingWithLastPriceFetchDay();
         }
 
-        public Task<IEnumerable<Tuple<Listing, Option<DateTime>>>> GetActiveListingWithLastEodPriceDateTime()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

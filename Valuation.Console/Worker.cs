@@ -34,7 +34,10 @@ namespace Valuation.Console
             System.Console.WriteLine("Hello World!");
             if (!token.IsCancellationRequested)
                 await endOfDayPriceService.DownloadEndOfDayPrices(DateTime.Now.Date);
+            logger.LogInformation("Prices downloaded.");
+            await Task.CompletedTask;
         }
+
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
