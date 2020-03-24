@@ -33,14 +33,11 @@ namespace Valuation.Console
                 var uriString = hostContext.Configuration["WorldTradingDataUri"];
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr));
 
-                services.AddTransient<IEndOfDayRepository, EndOfDayRepository>(s =>
-                   new EndOfDayRepository(s.GetService<PicassoDbContext>(), s.GetService<IObjectMapper>()));
-                services.AddTransient<IListingRepository, ListingRepository>(s =>
-                    new ListingRepository(s.GetService<PicassoDbContext>(), s.GetService<IObjectMapper>()));
-
-                services.AddTransient<IWorldTradingDataRepository, WorldTradingDataRepository>(s =>
-                 new WorldTradingDataRepository(s.GetService<PicassoDbContext>()));
-
+                services.AddTransient<IEndOfDayRepository, EndOfDayRepository>();
+                services.AddTransient<IListingRepository, ListingRepository>();
+                services.AddTransient<IWorldTradingDataRepository, WorldTradingDataRepository>();
+                services.AddTransient<IEndOfDayLogRepository, EndOfDayLogRepository>();
+                
 
                 services.AddHttpClient();
                 services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
@@ -48,6 +45,7 @@ namespace Valuation.Console
                 services.AddTransient<IWorldTradingDataService, WorldTradingDataService>(s =>
                 new WorldTradingDataService(new System.Uri(uriString), s.GetService<IWorldTradingDataRepository>()));
                 services.AddTransient<IListingService, ListingService>();
+                services.AddTransient<IEndOfDayLogService, EndOfDayLogService>();
 
             });
 
