@@ -19,7 +19,8 @@ namespace Valuation.Console
     {
         static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -31,10 +32,10 @@ namespace Valuation.Console
                 var conStr = hostContext.Configuration.GetConnectionString("PicassoDbConnectionString");
                 var uriString = hostContext.Configuration["WorldTradingDataUri"];
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr));
-                
-                services.AddTransient<IEndOfDayRepository, EndOfDayRepository>( s => 
-                    new EndOfDayRepository(s.GetService<PicassoDbContext>(), s.GetService<IObjectMapper>()));
-                services.AddTransient<IListingRepository, ListingRepository>(s => 
+
+                services.AddTransient<IEndOfDayRepository, EndOfDayRepository>(s =>
+                   new EndOfDayRepository(s.GetService<PicassoDbContext>(), s.GetService<IObjectMapper>()));
+                services.AddTransient<IListingRepository, ListingRepository>(s =>
                     new ListingRepository(s.GetService<PicassoDbContext>(), s.GetService<IObjectMapper>()));
 
                 services.AddTransient<IWorldTradingDataRepository, WorldTradingDataRepository>(s =>
@@ -44,11 +45,11 @@ namespace Valuation.Console
                 services.AddHttpClient();
                 services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
                 services.AddTransient<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
-                services.AddTransient<IWorldTradingDataService, WorldTradingDataService>(s => 
+                services.AddTransient<IWorldTradingDataService, WorldTradingDataService>(s =>
                 new WorldTradingDataService(new System.Uri(uriString), s.GetService<IWorldTradingDataRepository>()));
                 services.AddTransient<IListingService, ListingService>();
 
             });
-        
+
     }
 }

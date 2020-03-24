@@ -7,7 +7,7 @@ namespace Valuation.Service
 {
     public interface IEndOfDayPriceService
     {
-        Task DownloadEndOfDayPrices(DateTime endOfDay);
+        Task DownloadEndOfDayPrices();
     }
         
 }

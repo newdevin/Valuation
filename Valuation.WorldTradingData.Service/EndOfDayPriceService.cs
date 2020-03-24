@@ -24,7 +24,7 @@ namespace Valuation.WorldTradingData.Service
             this.listingService = listingService;
             this.httpClientFactory = httpClientFactory;
         }
-        public async Task DownloadEndOfDayPrices(DateTime endOfDay)
+        public async Task DownloadEndOfDayPrices()
         {
             var listingsWithDate = await listingService.GetActiveListingWithLastEodPriceDateTime();
             var queue = new ConcurrentQueue<EndOfDayPrice>();

@@ -61,7 +61,7 @@ namespace WorldTradingData.Service.Test
             worldTradingDataService.GetEndOfDayPriceUri(Arg.Any<DateTime>(), Arg.Any<string>(), Arg.Any<string>())
                 .Returns(new Uri("http://someuri"));
 
-            await endOfDayService.DownloadEndOfDayPrices(DateTime.Now);
+            await endOfDayService.DownloadEndOfDayPrices();
 
             _ = endOfDayRepository.Received().Save(Arg.Is<IEnumerable<EndOfDayPrice>>(l => l.Count() == 3));
 

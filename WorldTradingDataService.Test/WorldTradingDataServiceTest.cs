@@ -43,7 +43,7 @@ namespace WorldTradingData.Service.Test
             Assert.Equal(symbol, tokens["symbol"]);
 
             var uriPathOnly = uri.ToString().Substring(0, uri.ToString().IndexOf("?"));
-            Assert.Equal($"{Base_Uri}/api.v1/history", uriPathOnly);
+            Assert.Equal($"{Base_Uri}/api/v1/history", uriPathOnly);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace WorldTradingData.Service.Test
             Assert.Equal(dateString, tokens["date_from"]);
 
             var uriPathOnly = uri.ToString().Substring(0, uri.ToString().IndexOf("?"));
-            Assert.Equal($"{Base_Uri}/api.v1/history", uriPathOnly);
+            Assert.Equal($"{Base_Uri}/api/v1/history", uriPathOnly);
 
         }
 

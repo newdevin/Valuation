@@ -33,7 +33,7 @@ namespace Valuation.Console
         {
             System.Console.WriteLine("Hello World!");
             if (!token.IsCancellationRequested)
-                await endOfDayPriceService.DownloadEndOfDayPrices(DateTime.Now.Date);
+                await endOfDayPriceService.DownloadEndOfDayPrices();
             logger.LogInformation("Prices downloaded.");
             await Task.CompletedTask;
         }
