@@ -64,7 +64,8 @@ namespace Valuation.Console
                 catch (Exception e)
                 {
                     await endOfDayLogService.SetErrored(id);
-                    logger.LogError(e, "An Error has occurred while downloading end of day prices");
+                    lastRunDateTime = null;
+                    logger.LogError(e, "An Error has occurred while downloading end of day prices {@e}", e);
                 }
             }
             await Task.CompletedTask;
