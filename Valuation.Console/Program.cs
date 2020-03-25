@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Valuation.Infrastructure;
 using IObjectMapper = Valuation.Infrastructure.IObjectMapper;
+using Serilog;
+using Serilog.Events;
 
 namespace Valuation.Console
 {
@@ -25,6 +27,18 @@ namespace Valuation.Console
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+            .ConfigureLogging(builder =>
+           {
+               var logConfiguration = new LoggerConfiguration()
+               .MinimumLevel.Debug()
+               .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+               .Enrich.FromLogContext()
+               .WriteTo.Console()
+               .WriteTo.File("Valuation.Log", LogEventLevel.Warning, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 5_000_000, retainedFileCountLimit: 5)
+               .CreateLogger();
+
+               builder.AddSerilog(logConfiguration,true );
+           })
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<Worker>();
@@ -37,7 +51,7 @@ namespace Valuation.Console
                 services.AddTransient<IListingRepository, ListingRepository>();
                 services.AddTransient<IWorldTradingDataRepository, WorldTradingDataRepository>();
                 services.AddTransient<IEndOfDayLogRepository, EndOfDayLogRepository>();
-                
+
 
                 services.AddHttpClient();
                 services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
