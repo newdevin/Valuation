@@ -7,9 +7,10 @@ namespace Valuation.Service
 {
     public interface IEndOfDayLogService
     {
-        Task<int> Start();
-        Task Complete(int id);
-        Task<bool> HasRunOn(DateTime day);
-        Task SetErrored(int id);
+        Task<int> EndOfDayPriceDownloadStarted();
+        Task EndOfDayPriceDownloadCompleted(int id);
+        Task<bool> EndOfDayPriceDownloadHasRunOn(DateTime day);
+        Task SetEndOfDayDownloadToErrored(int id);
     }
+
 }

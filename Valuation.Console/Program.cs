@@ -48,19 +48,25 @@ namespace Valuation.Console
                 var uriString = hostContext.Configuration["WorldTradingDataUri"];
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr));
 
-                services.AddTransient<IEndOfDayRepository, EndOfDayRepository>();
+                services.AddTransient<IEndOfDayPriceRepository, EndOfDayPriceRepository>();
                 services.AddTransient<IListingRepository, ListingRepository>();
                 services.AddTransient<IWorldTradingDataRepository, WorldTradingDataRepository>();
                 services.AddTransient<IEndOfDayLogRepository, EndOfDayLogRepository>();
+                services.AddTransient<ICurrencyRatesLogRepository, CurrencyRatesLogRepository>();
+                services.AddTransient<ICurrencyRateRepository, CurrencyRateRepository>();
 
 
                 services.AddHttpClient();
-                services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
+                services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>();
+                services.AddTransient<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>();
                 services.AddTransient<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
                 services.AddTransient<IWorldTradingDataService, WorldTradingDataService>(s =>
                 new WorldTradingDataService(new System.Uri(uriString), s.GetService<IWorldTradingDataRepository>()));
                 services.AddTransient<IListingService, ListingService>();
                 services.AddTransient<IEndOfDayLogService, EndOfDayLogService>();
+                services.AddTransient<ICurrencyRatesLogService, CurrencyRatesLogService>();
+                services.AddTransient<ICurrencyService, CurrencyService>();
+                services.AddTransient<ICurrencyRateService, CurrencyRateService>();
 
             });
 

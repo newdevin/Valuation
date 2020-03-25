@@ -18,19 +18,19 @@ namespace WorldTradingData.Service.Test
 {
     public class EndOfDayServiceTest
     {
-        EndOfDayPriceService endOfDayService;
+        EndOfDayPriceDownloadService endOfDayService;
         IWorldTradingDataService worldTradingDataService;
-        IEndOfDayRepository endOfDayRepository;
+        IEndOfDayPriceRepository endOfDayRepository;
         IListingService listingService;
         IHttpClientFactory httpClientFactory;
         public EndOfDayServiceTest()
         {
             worldTradingDataService = Substitute.For<IWorldTradingDataService>();
-            endOfDayRepository = Substitute.For<IEndOfDayRepository>();
+            endOfDayRepository = Substitute.For<IEndOfDayPriceRepository>();
             listingService = Substitute.For<IListingService>();
             httpClientFactory = Substitute.For<IHttpClientFactory>();
 
-            endOfDayService = new EndOfDayPriceService(worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
+            endOfDayService = new EndOfDayPriceDownloadService(worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
         }
 
         private IEnumerable<Tuple<Listing, DateTime?>> GetListings()

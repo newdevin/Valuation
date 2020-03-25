@@ -4,7 +4,7 @@ using Valuation.Domain;
 
 namespace Valuation.WorldTradingData.Service
 {
-    public interface IEndOfDayRepository
+    public interface IEndOfDayPriceRepository
     {
         Task Save(IEnumerable<EndOfDayPrice> endOfDayPrices);
     }

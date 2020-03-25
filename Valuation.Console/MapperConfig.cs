@@ -12,7 +12,7 @@ namespace Valuation.Console
     {
         public MapperConfig()
         {
-            MapCurrency();
+            //MapCurrency();
             MapExchange();
             MapCompany();
             MapListing();
@@ -61,11 +61,11 @@ namespace Valuation.Console
                             .ReverseMap();
         }
 
-        private void MapCurrency()
-        {
-            CreateMap<CurrencyEntity, Currency>()
-                            .ConstructUsing(entity => new Currency(entity.Symbol))
-                            .ReverseMap();
-        }
+        //private void MapCurrency()
+        //{
+        //    CreateMap<CurrencyEntity, Currency>()
+        //                    .ConstructUsing(entity => new Currency(entity.Symbol))
+        //                    .ReverseMap();
+        //}
     }
 }

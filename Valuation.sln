@@ -15,9 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{745EB006
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorldTradingDataService.Test", "WorldTradingDataService.Test\WorldTradingDataService.Test.csproj", "{DA099384-93DA-4F36-95A4-368D1233896E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Infrastructure", "Valuation.Infrastructure\Valuation.Infrastructure.csproj", "{F90051BE-9D20-4DC9-8F41-4B84570B2438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Infrastructure", "Valuation.Infrastructure\Valuation.Infrastructure.csproj", "{F90051BE-9D20-4DC9-8F41-4B84570B2438}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Console", "Valuation.Console\Valuation.Console.csproj", "{442519C3-FBA9-4805-8E0A-4686C0D9BA02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Console", "Valuation.Console\Valuation.Console.csproj", "{442519C3-FBA9-4805-8E0A-4686C0D9BA02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Service.Test", "Valuation.Service.Test\Valuation.Service.Test.csproj", "{F6922614-7FEB-416E-9B19-BA1E32740B30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,12 +55,17 @@ Global
 		{442519C3-FBA9-4805-8E0A-4686C0D9BA02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{442519C3-FBA9-4805-8E0A-4686C0D9BA02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{442519C3-FBA9-4805-8E0A-4686C0D9BA02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6922614-7FEB-416E-9B19-BA1E32740B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6922614-7FEB-416E-9B19-BA1E32740B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6922614-7FEB-416E-9B19-BA1E32740B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6922614-7FEB-416E-9B19-BA1E32740B30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DA099384-93DA-4F36-95A4-368D1233896E} = {745EB006-1927-452E-90C2-F8AEFF85FD08}
+		{F6922614-7FEB-416E-9B19-BA1E32740B30} = {745EB006-1927-452E-90C2-F8AEFF85FD08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1A51E4C4-EF83-499C-9C1D-03B73E22626D}

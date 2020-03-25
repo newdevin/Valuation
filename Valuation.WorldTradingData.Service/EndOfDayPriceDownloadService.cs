@@ -9,15 +9,15 @@ using System.Collections.Concurrent;
 
 namespace Valuation.WorldTradingData.Service
 {
-    public class EndOfDayPriceService : IEndOfDayPriceService
+    public class EndOfDayPriceDownloadService : IEndOfDayPriceDownloadService
     {
         private readonly IWorldTradingDataService worldTradingDataService;
-        private readonly IEndOfDayRepository endOfDayRepository;
+        private readonly IEndOfDayPriceRepository endOfDayRepository;
         private readonly IListingService listingService;
         private readonly IHttpClientFactory httpClientFactory;
 
-        public EndOfDayPriceService(IWorldTradingDataService worldTradingDataService,
-            IEndOfDayRepository endOfDayRepository, IListingService listingService, IHttpClientFactory httpClientFactory)
+        public EndOfDayPriceDownloadService(IWorldTradingDataService worldTradingDataService,
+            IEndOfDayPriceRepository endOfDayRepository, IListingService listingService, IHttpClientFactory httpClientFactory)
         {
             this.worldTradingDataService = worldTradingDataService;
             this.endOfDayRepository = endOfDayRepository;
@@ -43,7 +43,6 @@ namespace Valuation.WorldTradingData.Service
             await Task.WhenAll(task);
             await endOfDayRepository.Save(queue.Select(eodPrice => eodPrice));
         }
-
         private async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPrice(int listingId, Uri uri)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -95,7 +94,6 @@ namespace Valuation.WorldTradingData.Service
             }
             return Array.Empty<EndOfDayPrice>();
         }
-
 
     }
 }

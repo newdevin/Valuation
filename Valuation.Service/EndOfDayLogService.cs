@@ -11,22 +11,22 @@ namespace Valuation.Service
         {
             this.endOfDayLogRepository = endOfDayLogRepository;
         }
-        public Task Complete(int id)
+        public Task EndOfDayPriceDownloadCompleted(int id)
         {
             return endOfDayLogRepository.Complete(id);
         }
 
-        public Task<bool> HasRunOn(DateTime day)
+        public Task<bool> EndOfDayPriceDownloadHasRunOn(DateTime day)
         {
             return endOfDayLogRepository.HasRunOn(day);
         }
 
-        public Task SetErrored(int id)
+        public Task SetEndOfDayDownloadToErrored(int id)
         {
             return endOfDayLogRepository.SetErrored(id);
         }
 
-        public Task<int> Start()
+        public Task<int> EndOfDayPriceDownloadStarted()
         {
             return endOfDayLogRepository.Start();
         }

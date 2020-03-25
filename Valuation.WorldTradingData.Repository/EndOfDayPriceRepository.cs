@@ -10,12 +10,12 @@ using Valuation.WorldTradingData.Service;
 
 namespace Valuation.WorldTradingData.Repository
 {
-    public class EndOfDayRepository : IEndOfDayRepository
+    public class EndOfDayPriceRepository : IEndOfDayPriceRepository
     {
         private readonly PicassoDbContext context;
         private readonly IObjectMapper mapper;
 
-        public EndOfDayRepository(PicassoDbContext context, IObjectMapper mapper)
+        public EndOfDayPriceRepository(PicassoDbContext context, IObjectMapper mapper)
         {
             this.context = context;
             this.mapper = mapper;
@@ -28,7 +28,7 @@ namespace Valuation.WorldTradingData.Repository
                 var e = context.EndOfDayPrices.Where(eod => eod.Listing.Id == eodPrice.ListingId && eod.Day == eodPrice.Day).ToList();
                 context.EndOfDayPrices.RemoveRange(e);
             }
-            await context.SaveChangesAsync();
+            
             var entities = endOfDayPrices
                 .Select(endOfDayPrice => mapper.MapTo<EndOfDayPrice, EndOfDayPriceEntity>(endOfDayPrice))
                 .ToList();

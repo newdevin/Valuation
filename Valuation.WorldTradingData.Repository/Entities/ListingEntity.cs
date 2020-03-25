@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Valuation.Domain;
 
 namespace Valuation.WorldTradingData.Repository.Entities
 {
@@ -14,7 +15,7 @@ namespace Valuation.WorldTradingData.Repository.Entities
         public string CurrencySymbol { get; set; }
         public CompanyEntity Company { get; set; }
         public ExchangeEntity Exchange { get; set; }
-        public CurrencyEntity Currency { get; set; }
+        public Currency Currency { get; set; }
     }
 
 }

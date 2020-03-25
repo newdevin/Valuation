@@ -12,21 +12,28 @@ namespace Valuation.Console
 {
     public class Worker : IHostedService
     {
-        private readonly IEndOfDayPriceService endOfDayPriceService;
+        private readonly IEndOfDayPriceDownloadService endOfDayPriceService;
         private readonly IEndOfDayLogService endOfDayLogService;
+        private readonly ICurrencyRatesDownloadService currencyRatesDownloadService;
+        private readonly ICurrencyRatesLogService currencyRatesLogService;
         private readonly IConfiguration configuration;
         private readonly ILogger<Worker> logger;
 
-        private DateTime? lastRunDateTime;
+        private DateTime? endOfDayPriceDownloadedDateTime;
+        private DateTime? currencyRatesDownloadedDateTime;
 
         public Worker(ILogger<Worker> logger,
-            IEndOfDayPriceService endOfDayPriceService,
+            IEndOfDayPriceDownloadService endOfDayPriceService,
             IEndOfDayLogService endOfDayLogService,
+            ICurrencyRatesDownloadService currencyRatesDownloadService,
+            ICurrencyRatesLogService currencyRatesLogService,
             IConfiguration configuration)
         {
             this.logger = logger;
             this.endOfDayPriceService = endOfDayPriceService;
             this.endOfDayLogService = endOfDayLogService;
+            this.currencyRatesDownloadService = currencyRatesDownloadService;
+            this.currencyRatesLogService = currencyRatesLogService;
             this.configuration = configuration;
 
         }
@@ -50,38 +57,81 @@ namespace Valuation.Console
 
             var startTime = TimeSpan.Parse(configuration["DownloadStartTime"]);
             DateTime now = DateTime.Now;
-            if (now.TimeOfDay >= startTime && !await EndOfDayPricesDownloadedToday())
+            if (now.TimeOfDay >= startTime)
             {
-                var id = await endOfDayLogService.Start();
-                try
-                {
-                    lastRunDateTime = now.Date;
-                    logger.LogInformation("Started end of day price download");
-                    await endOfDayPriceService.DownloadEndOfDayPrices();
-                    await endOfDayLogService.Complete(id);
-                    logger.LogInformation("Finished end of day price download");
-                }
-                catch (Exception e)
-                {
-                    await endOfDayLogService.SetErrored(id);
-                    lastRunDateTime = null;
-                    logger.LogError(e, "An Error has occurred while downloading end of day prices {@e}", e);
-                }
+                if (!await EndOfDayPricesDownloadedToday())
+                    await DownloadEndOfPrices(now);
+                if (!await CurrencyRatesDownloadedToday())
+                    await DownloadCurrencyRates(now);
             }
+
             await Task.CompletedTask;
 
         }
 
+        private async Task DownloadEndOfPrices(DateTime now)
+        {
+            var id = await endOfDayLogService.EndOfDayPriceDownloadStarted();
+            try
+            {
+                endOfDayPriceDownloadedDateTime = now.Date;
+                logger.LogInformation("Started end of day price download");
+                await endOfDayPriceService.DownloadEndOfDayPrices();
+                await endOfDayLogService.EndOfDayPriceDownloadCompleted(id);
+                logger.LogInformation("Finished end of day price download");
+            }
+            catch (Exception e)
+            {
+                await endOfDayLogService.SetEndOfDayDownloadToErrored(id);
+                endOfDayPriceDownloadedDateTime = null;
+                logger.LogError(e, "An Error has occurred while downloading end of day prices {@e}", e);
+            }
+        }
+        private async Task DownloadCurrencyRates(DateTime now)
+        {
+            var id = await currencyRatesLogService.CurrencyRatesDownloadStarted();
+            try
+            {
+                currencyRatesDownloadedDateTime = now.Date;
+                logger.LogInformation("Started currency rates download");
+                await currencyRatesDownloadService.DownloadCurrenctRates();
+                await currencyRatesLogService.CurrencyRatesDownloadCompleted(id);
+                logger.LogInformation("Finished currency rates download");
+            }
+            catch (Exception e)
+            {
+                await currencyRatesLogService.SetCurrencyRatesDownloadToErrored(id);
+                currencyRatesDownloadedDateTime = null;
+                logger.LogError(e, "An Error has occurred while downloading currency rates {@e}", e);
+            }
+        }
+
         private async Task<bool> EndOfDayPricesDownloadedToday()
         {
-            if (lastRunDateTime.HasValue && lastRunDateTime.Value.Date == DateTime.Now.Date)
+            if (endOfDayPriceDownloadedDateTime.HasValue && endOfDayPriceDownloadedDateTime.Value.Date == DateTime.Now.Date)
                 return true;
             else
             {
-                var hasRun = await endOfDayLogService.HasRunOn(DateTime.Now.Date);
+                var hasRun = await endOfDayLogService.EndOfDayPriceDownloadHasRunOn(DateTime.Now.Date);
                 if (hasRun)
                 {
-                    lastRunDateTime = DateTime.Now.Date;
+                    endOfDayPriceDownloadedDateTime = DateTime.Now.Date;
+                }
+                return hasRun;
+            }
+
+        }
+
+        private async Task<bool> CurrencyRatesDownloadedToday()
+        {
+            if (currencyRatesDownloadedDateTime.HasValue && currencyRatesDownloadedDateTime.Value.Date == DateTime.Now.Date)
+                return true;
+            else
+            {
+                var hasRun = await currencyRatesLogService.CurrencyRatesDownloadHasRunOn(DateTime.Now.Date);
+                if (hasRun)
+                {
+                    currencyRatesDownloadedDateTime = DateTime.Now.Date;
                 }
                 return hasRun;
             }
