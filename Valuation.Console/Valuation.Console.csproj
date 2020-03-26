@@ -23,7 +23,7 @@
     <ProjectReference Include="..\Valuation.Domain\Valuation.Domain.csproj" />
     <ProjectReference Include="..\Valuation.Infrastructure\Valuation.Infrastructure.csproj" />
     <ProjectReference Include="..\Valuation.Service\Valuation.Service.csproj" />
-    <ProjectReference Include="..\Valuation.WorldTradingData.Repository\Valuation.WorldTradingData.Repository.csproj" />
+    <ProjectReference Include="..\Valuation.WorldTradingData.Repository\Valuation.Repository.csproj" />
     <ProjectReference Include="..\Valuation.WorldTradingData.Service\Valuation.WorldTradingData.Service.csproj" />
   </ItemGroup>
 

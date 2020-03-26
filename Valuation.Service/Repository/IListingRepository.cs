@@ -9,5 +9,6 @@ namespace Valuation.Service.Repository
     public interface IListingRepository
     {
         Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastPriceFetchDay();
+        Task<IEnumerable<ListingVolume>> GetListingVolumes();
     }
 }

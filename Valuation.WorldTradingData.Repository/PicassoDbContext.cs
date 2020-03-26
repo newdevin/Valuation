@@ -7,7 +7,7 @@ using Valuation.Domain;
 using Valuation.Service;
 using Valuation.WorldTradingData.Repository.Entities;
 
-namespace Valuation.WorldTradingData.Repository
+namespace Valuation.Repository
 {
     public class PicassoDbContext : DbContext
     {

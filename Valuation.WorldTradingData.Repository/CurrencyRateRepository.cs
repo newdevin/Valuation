@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Valuation.Domain;
 using Valuation.Service;
 
-namespace Valuation.WorldTradingData.Repository
+namespace Valuation.Repository
 {
     public class CurrencyRateRepository : ICurrencyRateRepository
     {

@@ -8,7 +8,7 @@ using Valuation.Infrastructure;
 using Valuation.WorldTradingData.Repository.Entities;
 using Valuation.WorldTradingData.Service;
 
-namespace Valuation.WorldTradingData.Repository
+namespace Valuation.Repository
 {
     public class EndOfDayPriceRepository : IEndOfDayPriceRepository
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Valuation.WorldTradingData.Service;
 
-namespace Valuation.WorldTradingData.Repository
+namespace Valuation.Repository
 {
     public class WorldTradingDataRepository : IWorldTradingDataRepository
     {

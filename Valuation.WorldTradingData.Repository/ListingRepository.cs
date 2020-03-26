@@ -10,7 +10,7 @@ using Valuation.Infrastructure;
 using Valuation.Service.Repository;
 using Valuation.WorldTradingData.Repository.Entities;
 
-namespace Valuation.WorldTradingData.Repository
+namespace Valuation.Repository
 {
     public class ListingRepository : IListingRepository
     {
@@ -42,15 +42,18 @@ namespace Valuation.WorldTradingData.Repository
                 .SelectMany(x => x.EndOfDayPrice.DefaultIfEmpty(), (x, y) => new { ListingVolume = x.ListingVolume, eodPrice = x.EndOfDayPrice })
                 .ToList();
 
-
             var listingsWithDate = p
                 .Where(x => x.ListingVolume.Quantity > 0)
                 .Select(x => Tuple.Create(mapper.MapTo<ListingEntity, Listing>(x.ListingVolume.Listing), x.eodPrice?.FirstOrDefault()?.Day))
                 .ToList();
 
             return listingsWithDate;
+        }
 
-
+        public async Task<IEnumerable<ListingVolume>> GetListingVolumes()
+        {
+            var entities = await context.ListingVolumes.ToListAsync();
+            return entities.Select(e => mapper.MapTo<ListingVolumeEntity, ListingVolume>(e));
         }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Valuation.Domain;
 using Valuation.Service;
-using Valuation.WorldTradingData.Repository;
+using Valuation.Repository;
 using Valuation.WorldTradingData.Service;
 using AutoMapper;
 using Valuation.Service.Repository;

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Service", "Valuat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.WorldTradingData.Service", "Valuation.WorldTradingData.Service\Valuation.WorldTradingData.Service.csproj", "{05683BD9-5FA9-42A3-BB49-CCAD26A9CCA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.WorldTradingData.Repository", "Valuation.WorldTradingData.Repository\Valuation.WorldTradingData.Repository.csproj", "{9F83E932-53BD-4399-94A3-08C2691B32AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Repository", "Valuation.WorldTradingData.Repository\Valuation.Repository.csproj", "{9F83E932-53BD-4399-94A3-08C2691B32AA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{745EB006-1927-452E-90C2-F8AEFF85FD08}"
 EndProject
@@ -19,7 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Infrastructure", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Console", "Valuation.Console\Valuation.Console.csproj", "{442519C3-FBA9-4805-8E0A-4686C0D9BA02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Service.Test", "Valuation.Service.Test\Valuation.Service.Test.csproj", "{F6922614-7FEB-416E-9B19-BA1E32740B30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Service.Test", "Valuation.Service.Test\Valuation.Service.Test.csproj", "{F6922614-7FEB-416E-9B19-BA1E32740B30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Common", "Valuation.Common\Valuation.Common.csproj", "{E08CC7DC-B52F-4C50-B0CF-450AC702728D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Common.Test", "Valuation.Common.Test\Valuation.Common.Test.csproj", "{205D9605-22F5-4E1E-869F-CA151B3C6974}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +63,14 @@ Global
 		{F6922614-7FEB-416E-9B19-BA1E32740B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6922614-7FEB-416E-9B19-BA1E32740B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6922614-7FEB-416E-9B19-BA1E32740B30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E08CC7DC-B52F-4C50-B0CF-450AC702728D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E08CC7DC-B52F-4C50-B0CF-450AC702728D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E08CC7DC-B52F-4C50-B0CF-450AC702728D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E08CC7DC-B52F-4C50-B0CF-450AC702728D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{205D9605-22F5-4E1E-869F-CA151B3C6974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{205D9605-22F5-4E1E-869F-CA151B3C6974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{205D9605-22F5-4E1E-869F-CA151B3C6974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{205D9605-22F5-4E1E-869F-CA151B3C6974}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +78,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DA099384-93DA-4F36-95A4-368D1233896E} = {745EB006-1927-452E-90C2-F8AEFF85FD08}
 		{F6922614-7FEB-416E-9B19-BA1E32740B30} = {745EB006-1927-452E-90C2-F8AEFF85FD08}
+		{205D9605-22F5-4E1E-869F-CA151B3C6974} = {745EB006-1927-452E-90C2-F8AEFF85FD08}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1A51E4C4-EF83-499C-9C1D-03B73E22626D}
