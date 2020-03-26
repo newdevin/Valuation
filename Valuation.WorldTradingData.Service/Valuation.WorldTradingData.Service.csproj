@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Valuation.Service\Valuation.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repository\" />
+  </ItemGroup>
+
 </Project>

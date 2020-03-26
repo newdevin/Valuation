@@ -6,17 +6,26 @@ using System.Text;
 using System.Threading.Tasks;
 using Valuation.Domain;
 using Valuation.Service;
+using Valuation.Infrastructure;
 
 namespace Valuation.Repository
 {
     public class CurrencyRateRepository : ICurrencyRateRepository
     {
         private readonly PicassoDbContext context;
+        private readonly IObjectMapper mapper;
 
-        public CurrencyRateRepository(PicassoDbContext context)
+        public CurrencyRateRepository(PicassoDbContext context,IObjectMapper objectMapper)
         {
             this.context = context;
+            this.mapper = objectMapper;
         }
+
+        public async Task<IEnumerable<CurrencyRate>> GetCurencyRatesSince( DateTime sinceDay)
+        {
+            return await context.CurrencyRates.Where(cr =>  cr.Day >= sinceDay).ToListAsync();
+        }
+
         public async Task<IEnumerable<(Currency, DateTime?)>> GetCurrenciesWithLastDownloadedDate()
         {
             var currencies = await context.Currencies.Where(c=> c.Symbol != "GBP").ToListAsync();

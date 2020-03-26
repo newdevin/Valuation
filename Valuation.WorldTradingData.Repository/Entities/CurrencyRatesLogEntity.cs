@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Valuation.WorldTradingData.Repository.Entities
+namespace Valuation.Repository.Entities
 {
     [Table("CurrencyRatesLog")]
     public class CurrencyRatesLogEntity

@@ -54,6 +54,7 @@ namespace Valuation.Console
                 services.AddTransient<IEndOfDayLogRepository, EndOfDayLogRepository>();
                 services.AddTransient<ICurrencyRatesLogRepository, CurrencyRatesLogRepository>();
                 services.AddTransient<ICurrencyRateRepository, CurrencyRateRepository>();
+                services.AddTransient<IValuationRepository, ValuationRepository>();
 
 
                 services.AddHttpClient();
@@ -67,6 +68,8 @@ namespace Valuation.Console
                 services.AddTransient<ICurrencyRatesLogService, CurrencyRatesLogService>();
                 services.AddTransient<ICurrencyService, CurrencyService>();
                 services.AddTransient<ICurrencyRateService, CurrencyRateService>();
+                services.AddTransient<IValuationService, ValuationService>();
+                services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
 
             });
 

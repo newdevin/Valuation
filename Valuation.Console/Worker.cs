@@ -16,6 +16,7 @@ namespace Valuation.Console
         private readonly IEndOfDayLogService endOfDayLogService;
         private readonly ICurrencyRatesDownloadService currencyRatesDownloadService;
         private readonly ICurrencyRatesLogService currencyRatesLogService;
+        private readonly IValuationService valuationService;
         private readonly IConfiguration configuration;
         private readonly ILogger<Worker> logger;
 
@@ -27,6 +28,7 @@ namespace Valuation.Console
             IEndOfDayLogService endOfDayLogService,
             ICurrencyRatesDownloadService currencyRatesDownloadService,
             ICurrencyRatesLogService currencyRatesLogService,
+            IValuationService valuationService,
             IConfiguration configuration)
         {
             this.logger = logger;
@@ -34,6 +36,7 @@ namespace Valuation.Console
             this.endOfDayLogService = endOfDayLogService;
             this.currencyRatesDownloadService = currencyRatesDownloadService;
             this.currencyRatesLogService = currencyRatesLogService;
+            this.valuationService = valuationService;
             this.configuration = configuration;
 
         }
@@ -43,30 +46,41 @@ namespace Valuation.Console
             while (!cancellationToken.IsCancellationRequested)
             {
                 await DoWork(cancellationToken);
-                await Task.Delay(60_000);
+                if (AllDownloadSucceeded())
+                {
+                    await valuationService.ValuePortfolio(DateTime.Now.AddDays(-1));
+                    await Task.Delay(TimeSpan.FromHours(24));
+                }
+                else
+                    await Task.Delay(60_000);
             }
+        }
 
+        private bool AllDownloadSucceeded()
+        {
+            var today = DateTime.Now.Date;
+            if (endOfDayPriceDownloadedDateTime.HasValue && endOfDayPriceDownloadedDateTime.Value.Date == today
+                && currencyRatesDownloadedDateTime.HasValue && currencyRatesDownloadedDateTime.Value == today)
+                return true;
+            else
+                return false;
         }
 
         private async Task DoWork(CancellationToken token)
         {
             if (token.IsCancellationRequested)
-            {
                 return;
-            }
 
             var startTime = TimeSpan.Parse(configuration["DownloadStartTime"]);
-            DateTime now = DateTime.Now;
-            if (now.TimeOfDay >= startTime)
+            DateTime today = DateTime.Now;
+            if (today.TimeOfDay >= startTime)
             {
                 if (!await EndOfDayPricesDownloadedToday())
-                    await DownloadEndOfPrices(now);
+                    await DownloadEndOfPrices(today);
                 if (!await CurrencyRatesDownloadedToday())
-                    await DownloadCurrencyRates(now);
+                    await DownloadCurrencyRates(today);
             }
-
             await Task.CompletedTask;
-
         }
 
         private async Task DownloadEndOfPrices(DateTime now)
@@ -105,7 +119,6 @@ namespace Valuation.Console
                 logger.LogError(e, "An Error has occurred while downloading currency rates {@e}", e);
             }
         }
-
         private async Task<bool> EndOfDayPricesDownloadedToday()
         {
             if (endOfDayPriceDownloadedDateTime.HasValue && endOfDayPriceDownloadedDateTime.Value.Date == DateTime.Now.Date)
@@ -121,7 +134,6 @@ namespace Valuation.Console
             }
 
         }
-
         private async Task<bool> CurrencyRatesDownloadedToday()
         {
             if (currencyRatesDownloadedDateTime.HasValue && currencyRatesDownloadedDateTime.Value.Date == DateTime.Now.Date)
@@ -137,7 +149,6 @@ namespace Valuation.Console
             }
 
         }
-
         public Task StopAsync(CancellationToken cancellationToken)
         {
 

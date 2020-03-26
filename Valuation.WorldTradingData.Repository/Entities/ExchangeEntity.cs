@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Valuation.WorldTradingData.Repository.Entities
+namespace Valuation.Repository.Entities
 {
     [Table("Exchange")]
     public class ExchangeEntity

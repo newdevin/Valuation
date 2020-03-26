@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Valuation.Domain;
 using Valuation.Infrastructure;
 using Valuation.Service.Repository;
-using Valuation.WorldTradingData.Repository.Entities;
+using Valuation.Repository.Entities;
 
 namespace Valuation.Repository
 {
@@ -52,7 +52,7 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<ListingVolume>> GetListingVolumes()
         {
-            var entities = await context.ListingVolumes.ToListAsync();
+            var entities = await context.ListingVolumes.Include(lv=>lv.Listing.Currency).ToListAsync();
             return entities.Select(e => mapper.MapTo<ListingVolumeEntity, ListingVolume>(e));
         }
     }

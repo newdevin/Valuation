@@ -5,7 +5,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Text;
 using Valuation.Domain;
 using Valuation.Service;
-using Valuation.WorldTradingData.Repository.Entities;
+using Valuation.Repository.Entities;
 
 namespace Valuation.Repository
 {
@@ -17,7 +17,14 @@ namespace Valuation.Repository
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            modelBuilder.Entity<ListingValuation>(e =>
+            {
+                e.ToTable("Valuation");
+                e.Property(l => l.Currency).HasColumnName("ShareCurrency");
+                e.Property(l => l.Price).HasColumnName("SharePrice");
+                e.Property(l => l.Rate).HasColumnName("GBPCurrencyRate");
+                e.HasKey(l => l.Id);
+            });
             modelBuilder.Entity<CurrencyRate>().ToTable("CurrencyRate");
             modelBuilder.Entity<Currency>(c =>
             {
@@ -39,6 +46,7 @@ namespace Valuation.Repository
         public DbSet<EndOfDayPriceLogEntity> EndOfDayPriceLogs { get; set; }
         public DbSet<CurrencyRatesLogEntity> CurrencyRatesLogs { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
+        public DbSet<ListingValuation> Valuations { get; set; }
 
     }
 }

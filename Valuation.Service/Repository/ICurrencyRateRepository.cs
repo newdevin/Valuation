@@ -9,5 +9,6 @@ namespace Valuation.Service
     {
         Task<IEnumerable<(Currency, DateTime?)>>GetCurrenciesWithLastDownloadedDate();
         Task Save(IEnumerable<CurrencyRate> currencyRates);
+        Task<IEnumerable<CurrencyRate>> GetCurencyRatesSince( DateTime sinceDay);
     }
 }

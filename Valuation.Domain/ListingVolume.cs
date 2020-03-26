@@ -14,7 +14,7 @@ namespace Valuation.Domain
             Id = id;
             Listing = listing ?? throw new ArgumentException(nameof(listing)); 
             Quantity = quantity;
-            Day = day;
+            Day = day;  
             
         }
 

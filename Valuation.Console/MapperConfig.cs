@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Valuation.Domain;
-using Valuation.WorldTradingData.Repository.Entities;
+using Valuation.Repository.Entities;
 
 namespace Valuation.Console
 {

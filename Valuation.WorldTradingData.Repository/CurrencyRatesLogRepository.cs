@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Valuation.Service;
-using Valuation.WorldTradingData.Repository.Entities;
+using Valuation.Repository.Entities;
 
 namespace Valuation.Repository
 {

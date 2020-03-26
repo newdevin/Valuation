@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Valuation.Domain;
 
-namespace Valuation.WorldTradingData.Repository.Entities
+namespace Valuation.Repository.Entities
 {
     [Table("Listing")]
     public class ListingEntity

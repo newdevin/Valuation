@@ -18,6 +18,11 @@ namespace Valuation.Service
             return currencyRateRepository.GetCurrenciesWithLastDownloadedDate();
         }
 
+        public Task<IEnumerable<CurrencyRate>> GetCurencyRatesSince( DateTime sinceDay)
+        {
+            return currencyRateRepository.GetCurencyRatesSince( sinceDay);
+        }
+
         public Task Save(IEnumerable<CurrencyRate> currencyRates)
         {
             return currencyRateRepository.Save(currencyRates);
