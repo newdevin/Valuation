@@ -33,7 +33,7 @@ namespace Valuation.WorldTradingData.Service
                 return Task.Run(async () =>
                 {
                     var uri = worldTradingDataService.GetEndOfDayPriceUri(listingWithDate.Item2?.AddDays(1), listingWithDate.Item1.Symbol, listingWithDate.Item1.Suffix);
-                    var endOfDayPrices = await GetEndOfDayPrice(listingWithDate.Item1.Id, uri);
+                    var endOfDayPrices = await GetEndOfDayPrice(listingWithDate.Item1.Id, uri, listingWithDate.Item1.Currency.Symbol);
                     foreach (var eodPrice in endOfDayPrices)
                     {
                         queue.Enqueue(eodPrice);
@@ -43,7 +43,7 @@ namespace Valuation.WorldTradingData.Service
             await Task.WhenAll(task);
             await endOfDayRepository.Save(queue.Select(eodPrice => eodPrice));
         }
-        private async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPrice(int listingId, Uri uri)
+        private async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPrice(int listingId, Uri uri, string currency)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -69,18 +69,26 @@ namespace Valuation.WorldTradingData.Service
 
                     if (decimal.TryParse(p[1], out decimal price))
                     {
+                        if (currency == "GBP")
+                            price = price / 100;
                         openPrice = price;
                     }
                     if (decimal.TryParse(p[2], out price))
                     {
+                        if (currency == "GBP")
+                            price = price / 100;
                         closePrice = price;
                     }
                     if (decimal.TryParse(p[3], out price))
                     {
+                        if (currency == "GBP")
+                            price = price / 100;
                         highPrice = price;
                     }
                     if (decimal.TryParse(p[4], out price))
                     {
+                        if (currency == "GBP")
+                            price = price / 100;
                         lowPrice = price;
                     }
 

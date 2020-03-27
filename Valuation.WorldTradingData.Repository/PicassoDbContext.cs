@@ -47,6 +47,9 @@ namespace Valuation.Repository
         public DbSet<CurrencyRatesLogEntity> CurrencyRatesLogs { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
         public DbSet<ListingValuation> Valuations { get; set; }
+        public DbSet<ValuationSummaryEntity> ValuationSummaries { get; set; }
+        public DbSet<BuyTradeEntity> BuyTrades { get; set; }
+        public DbSet<SellTradeEntity> SellTrades { get; set; }
 
     }
 }

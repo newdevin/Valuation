@@ -26,16 +26,16 @@ namespace Valuation.Repository
         {
 
             var allListingEntities = context.ListingVolumes
-                .Include(lv => lv.Listing);
+                .Include(lv => lv.Listing.Currency);
 
             var activeListingVolumeEntities = await context.ListingVolumes
                                     .Where(lv => lv.Day == allListingEntities.Where(al => al.Listing.Id == lv.Listing.Id).Max(al => al.Day))
-                                    .Include(lv => lv.Listing)
+                                    .Include(lv => lv.Listing.Currency)
                                     .Select(lv => lv).ToListAsync();
 
             var eodPrices = await context.EndOfDayPrices
                                     .Where(eodPrice => eodPrice.Day == context.EndOfDayPrices.Where(al => al.Listing.Id == eodPrice.Listing.Id).Max(al => al.Day))
-                                    .Include(eod => eod.Listing)
+                                    .Include(eod => eod.Listing.Currency)
                                     .ToListAsync();
 
             var p = activeListingVolumeEntities.GroupJoin(eodPrices, lv => lv.Listing.Id, eod => eod.Listing.Id, (lv, eod) => new { ListingVolume = lv, EndOfDayPrice = eod })

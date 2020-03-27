@@ -65,10 +65,8 @@ namespace Valuation.Service
                                 .OrderByDescending(x => x.Day)
                                 .First();
                 var rate = 1m;
-                var factor = 100;
                 if (l.Symbol != "GBP")
                 {
-                    factor = 1;
                     rate = currencyRates.Where(cr => cr.From == l.Symbol && cr.Day <= l.Day)
                     .OrderByDescending(x => x.Day)
                     .First()
@@ -80,17 +78,17 @@ namespace Valuation.Service
                     Day = l.Day,
                     Currency = l.Symbol,
                     ListingId = l.ListingId,
-                    Price = eodPrice.ClosePrice.Value / factor,
+                    Price = eodPrice.ClosePrice.Value ,
                     Quantity = l.Quantity,
                     Rate = rate,
-                    TotalValue = l.Quantity * eodPrice.ClosePrice.Value / factor,
-                    TotalValueInGbp = l.Quantity * eodPrice.ClosePrice.Value * rate / factor
+                    TotalValue = l.Quantity * eodPrice.ClosePrice.Value ,
+                    TotalValueInGbp = l.Quantity * eodPrice.ClosePrice.Value * rate 
                 };
 
             })
             .ToList();
 
-            await valuationRepository.Save(valuations);
+             await valuationRepository.Save(valuations);
         }
     }
 
