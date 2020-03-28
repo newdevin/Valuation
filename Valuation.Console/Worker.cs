@@ -75,12 +75,12 @@ namespace Valuation.Console
             DateTime today = DateTime.Now;
             if (today.TimeOfDay >= startTime)
             {
-                var downloadEndOfDayPricesTask = new Task(async () =>
+                var downloadEndOfDayPricesTask = Task.Run(async () =>
                 {
                     if (!await EndOfDayPricesDownloadedToday().ConfigureAwait(false))
                         await DownloadEndOfPrices(today).ConfigureAwait(false);
                 });
-                var currencyRatesDownloadTask = new Task(async () =>
+                var currencyRatesDownloadTask = Task.Run(async () =>
                 {
                     if (!await CurrencyRatesDownloadedToday().ConfigureAwait(false))
                         await DownloadCurrencyRates(today).ConfigureAwait(false);

@@ -25,7 +25,7 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPriceSince(DateTime sinceDay)
         {
-            var entities = await context.EndOfDayPrices
+            var entities = await context.EndOfDayPrices.Include(e=> e.Listing)
                 .Where(eod => eod.Day >= sinceDay)
                 .ToListAsync();
             return entities.Select(e => mapper.MapTo<EndOfDayPriceEntity, EndOfDayPrice>(e));

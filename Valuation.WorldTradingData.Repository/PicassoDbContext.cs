@@ -40,6 +40,15 @@ namespace Valuation.Repository
             {
                 e.ToTable("SellTrade");
             });
+            modelBuilder.Entity<ValuationSummary>(e =>
+            {
+                e.ToTable("ValuationSummary");
+            });
+
+            modelBuilder.Entity<ListingValuation>(e =>
+            {
+                e.ToTable("Valuation");
+            });
 
             base.OnModelCreating(modelBuilder);
         }
