@@ -41,7 +41,26 @@ namespace Valuation.Service.Test
             Assert.Equal(3, actual.Count());
             var first = actual.First(a => a.Day == day1);
             Assert.Equal(1050, first.ValuationInGbp);
-            Assert.Equal(1050, first.TotalCostInGBP);
+            Assert.Equal(1106, first.TotalCostInGBP);
+            Assert.Equal(-56, first.TotalProfitInGBP);
+            Assert.Equal(0, first.TotalSellInGBP);
+            Assert.Equal(0, first.TotalRealisedInGBP);
+
+            var second = actual.First(a => a.Day == day2);
+            Assert.Equal(1200, second.ValuationInGbp);
+            Assert.Equal(1106, second.TotalCostInGBP);
+            Assert.Equal(0, second.TotalSellInGBP);
+            Assert.Equal(94, second.TotalProfitInGBP);
+            Assert.Equal(0, second.TotalRealisedInGBP);
+
+
+            var third = actual.First(a => a.Day == day3);
+            Assert.Equal(105, third.ValuationInGbp);
+            Assert.Equal(1106, third.TotalCostInGBP);
+            Assert.Equal(1500, third.TotalSellInGBP);
+            Assert.Equal(499, third.TotalProfitInGBP);
+            Assert.Equal(499, third.TotalRealisedInGBP);
+
 
         }
     }
