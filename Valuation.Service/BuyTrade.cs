@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
-namespace Valuation.Repository.Entities
+namespace Valuation.Service
 {
-    [Table("BuyTrade")]
-    public class BuyTradeEntity
+    public class BuyTrade
     {
         public int Id { get; set; }
         public int ListingId { get; set; }
@@ -15,7 +11,5 @@ namespace Valuation.Repository.Entities
         public string PricePerShareCurrency { get; set; }
         public DateTime BoughtOn { get; set; }
         public decimal TotalPaidInGbp { get; set; }
-
-
     }
 }

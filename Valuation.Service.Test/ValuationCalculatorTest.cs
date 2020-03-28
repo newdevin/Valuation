@@ -9,25 +9,11 @@ using Xunit;
 
 namespace Valuation.Service.Test
 {
-    public class ValuationServiceTest
+    public class ValuationCalculatorTest
     {
-        private readonly IEndOfDayPriceService endOfDayPriceService;
-        private readonly ICurrencyRateService currencyRateService;
-        private readonly IListingService listingService;
-        private readonly IValuationRepository valuationRepository;
-        ValuationService valuationService;
-
-        public ValuationServiceTest()
-        {
-            endOfDayPriceService = Substitute.For<IEndOfDayPriceService>();
-            currencyRateService = Substitute.For<ICurrencyRateService>();
-            listingService = Substitute.For<IListingService>();
-            valuationRepository = Substitute.For<IValuationRepository>();
-
-            valuationService = new ValuationService(endOfDayPriceService, currencyRateService, listingService, valuationRepository);
-        }
+                
         [Fact]
-        public async Task ShouldReturnCorrectValuationForGBPCurrency()
+        public void ShouldReturnCorrectValuationForGbpCurrency()
         {
             var company = new Company(1, "Abcam", "Abcam ltd.");
             var exchange = new Exchange("LSE");
@@ -49,32 +35,26 @@ namespace Valuation.Service.Test
                 new EndOfDayPrice(listingId,listingVolume.Day,1,1,1,1,1000),
                 new EndOfDayPrice(listingId,listingVolume2.Day,1,2,1,1,1000),
             };
-            endOfDayPriceService.GetEndOfDayPriceSince(listingDate).Returns(eodPrices);
 
             var currencyRates = new List<CurrencyRate> { };
-            currencyRateService.GetCurencyRatesSince(listingDate).Returns(currencyRates);
 
-            listingService.GetListingVolumes().Returns(new List<ListingVolume>
+            var listingVolumes = new List<ListingVolume>
             {
                 listingVolume,
                 listingVolume2,
                 listingVolume3
-            });
+            };
+            var valuationCalculator = new ValuationCalculator();
 
-            IEnumerable<ListingValuation> valuations = null;
-            await valuationRepository.Save(Arg.Do<IEnumerable<ListingValuation>>(vals => valuations = vals));
-
-            await valuationService.ValuePortfolio(listingVolume3.Day);
-
+            var valuations = valuationCalculator.GetValuations(listingVolume3.Day, listingVolumes, eodPrices, currencyRates);
             Assert.Equal(3, valuations.Count());
             Assert.Equal(100m, valuations.First(v => v.Day == listingVolume.Day).TotalValueInGbp);
             Assert.Equal(100m, valuations.First(v => v.Day == listingVolume.Day.AddDays(1)).TotalValueInGbp);
             Assert.Equal(400m, valuations.First(v => v.Day == listingVolume.Day.AddDays(2)).TotalValueInGbp);
-
         }
 
         [Fact]
-        public async Task ShouldReturnCorrectValuationForNonBPCurrency()
+        public void ShouldReturnCorrectValuationForNonBPCurrency()
         {
             var company = new Company(1, "YMAB", "Ymab ltd.");
             var exchange = new Exchange("NYSE");
@@ -95,34 +75,24 @@ namespace Valuation.Service.Test
                 new EndOfDayPrice(listingId,listingVolume.Day,1,1,1,1,1000),
                 new EndOfDayPrice(listingId,listingVolume2.Day,1,2,1,1,1000)
             };
-            endOfDayPriceService.GetEndOfDayPriceSince(listingDate).Returns(eodPrices);
-
+            
             var currencyRates = new List<CurrencyRate> {
             new CurrencyRate { Day = listingDate, From = "USD", To = "GBP" , Id =1, Rate = 0.50m},
             new CurrencyRate { Day = listingDate.AddDays(1), From = "USD", To = "GBP" , Id =1, Rate = 0.50m},
             new CurrencyRate { Day = listingDate.AddDays(2), From = "USD", To = "GBP" , Id =1, Rate = 1m}
             };
-            currencyRateService.GetCurencyRatesSince(listingDate).Returns(currencyRates);
 
-            listingService.GetListingVolumes().Returns(new List<ListingVolume> { listingVolume });
-
-            IEnumerable<ListingValuation> valuations = null;
-            await valuationRepository.Save(Arg.Do<IEnumerable<ListingValuation>>(vals => valuations = vals));
-
-            await valuationService.ValuePortfolio(listingVolume2.Day);
-
+            var listingVolumes = new List<ListingVolume> { listingVolume, listingVolume2 };
+            var valuationCalculator = new ValuationCalculator();
+            var valuations = valuationCalculator.GetValuations(listingVolume2.Day, listingVolumes, eodPrices, currencyRates);
 
             Assert.Equal(3, valuations.Count());
             Assert.Equal(50m, valuations.First(v => v.Day == listingVolume.Day).TotalValueInGbp);
             Assert.Equal(50m, valuations.First(v => v.Day == listingVolume.Day.AddDays(1)).TotalValueInGbp);
-            Assert.Equal(200m,valuations.First(v => v.Day == listingVolume.Day.AddDays(2)).TotalValueInGbp);
+            Assert.Equal(400m, valuations.First(v => v.Day == listingVolume.Day.AddDays(2)).TotalValueInGbp);
 
         }
 
-        [Fact]
-        public async Task ShouldReturnCorrectValuationSummary()
-        {
-
-        }
+       
     }
 }

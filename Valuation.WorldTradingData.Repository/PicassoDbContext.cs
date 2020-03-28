@@ -32,6 +32,14 @@ namespace Valuation.Repository
                 c.ToTable("Currency");
                 c.HasKey(p => p.Symbol);
             });
+            modelBuilder.Entity<BuyTrade>(e =>
+            {
+                e.ToTable("BuyTrade");
+            });
+            modelBuilder.Entity<SellTrade>(e =>
+            {
+                e.ToTable("SellTrade");
+            });
 
             base.OnModelCreating(modelBuilder);
         }
@@ -47,9 +55,9 @@ namespace Valuation.Repository
         public DbSet<CurrencyRatesLogEntity> CurrencyRatesLogs { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
         public DbSet<ListingValuation> Valuations { get; set; }
-        public DbSet<ValuationSummaryEntity> ValuationSummaries { get; set; }
-        public DbSet<BuyTradeEntity> BuyTrades { get; set; }
-        public DbSet<SellTradeEntity> SellTrades { get; set; }
+        public DbSet<ValuationSummary> ValuationSummaries { get; set; }
+        public DbSet<BuyTrade> BuyTrades { get; set; }
+        public DbSet<SellTrade> SellTrades { get; set; }
 
     }
 }
