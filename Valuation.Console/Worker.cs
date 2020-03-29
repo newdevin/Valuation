@@ -49,11 +49,18 @@ namespace Valuation.Console
                 if (AllDownloadSucceeded())
                 {
                     await valuationService.ValuePortfolio(DateTime.Now.AddDays(-1));
-                    await Task.Delay(TimeSpan.FromHours(24));
+                    await Task.Delay(GetNextRunTime());
                 }
                 else
                     await Task.Delay(60_000);
             }
+        }
+
+        public TimeSpan GetNextRunTime()
+        {
+            var now = DateTime.Now.Date;
+            var timeSpan = now.AddDays(1).AddHours(8) - now;
+            return timeSpan;
         }
 
         private bool AllDownloadSucceeded()
