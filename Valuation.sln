@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Console", "Valuat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Service.Test", "Valuation.Service.Test\Valuation.Service.Test.csproj", "{F6922614-7FEB-416E-9B19-BA1E32740B30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Common", "Valuation.Common\Valuation.Common.csproj", "{E08CC7DC-B52F-4C50-B0CF-450AC702728D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Common", "Valuation.Common\Valuation.Common.csproj", "{E08CC7DC-B52F-4C50-B0CF-450AC702728D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Common.Test", "Valuation.Common.Test\Valuation.Common.Test.csproj", "{205D9605-22F5-4E1E-869F-CA151B3C6974}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Common.Test", "Valuation.Common.Test\Valuation.Common.Test.csproj", "{205D9605-22F5-4E1E-869F-CA151B3C6974}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Web", "Valuation.Web\Valuation.Web.csproj", "{B178ACE5-F400-4353-B3B2-A623B2D4DDFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +73,10 @@ Global
 		{205D9605-22F5-4E1E-869F-CA151B3C6974}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{205D9605-22F5-4E1E-869F-CA151B3C6974}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{205D9605-22F5-4E1E-869F-CA151B3C6974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B178ACE5-F400-4353-B3B2-A623B2D4DDFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B178ACE5-F400-4353-B3B2-A623B2D4DDFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B178ACE5-F400-4353-B3B2-A623B2D4DDFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B178ACE5-F400-4353-B3B2-A623B2D4DDFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
