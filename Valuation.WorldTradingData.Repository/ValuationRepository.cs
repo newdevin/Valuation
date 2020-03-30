@@ -22,7 +22,7 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<ValuationSummary>> GetValuationSummary()
         {
-            return await context.ValuationSummaries.ToListAsync();
+            return await context.ValuationSummaries.OrderByDescending(s => s.Day).ToListAsync();
         }
 
         public async Task Save(IEnumerable<ListingValuation> valuations, IEnumerable<ValuationSummary> summary)
