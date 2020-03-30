@@ -19,6 +19,12 @@ namespace Valuation.Repository
         {
             this.context = context;
         }
+
+        public async Task<IEnumerable<ValuationSummary>> GetValuationSummary()
+        {
+            return await context.ValuationSummaries.ToListAsync();
+        }
+
         public async Task Save(IEnumerable<ListingValuation> valuations, IEnumerable<ValuationSummary> summary)
         {
             await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Valuation");

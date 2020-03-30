@@ -39,6 +39,10 @@ namespace Valuation.Service
             this.valuationSummaryCalculator = valuationSummaryCalculator;
         }
 
+        public Task<IEnumerable<ValuationSummary>> GetValuationSummary()
+        {
+            return valuationRepository.GetValuationSummary();
+        }
 
         public async Task ValuePortfolio(DateTime upToDate)
         {

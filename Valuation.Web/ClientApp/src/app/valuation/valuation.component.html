@@ -1,0 +1,4 @@
+<div class="container-fluid">
+summaries : {{this.valuations?.length}}
+<p-chart type="line" [data]="data" (onDataSelect)="selectData($event)"></p-chart>
+</div>

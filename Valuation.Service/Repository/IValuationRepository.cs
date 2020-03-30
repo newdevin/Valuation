@@ -9,6 +9,6 @@ namespace Valuation.Service.Repository
     public interface IValuationRepository
     {
         Task Save(IEnumerable<ListingValuation> valuations, IEnumerable<ValuationSummary> summary);
-
+        Task<IEnumerable<ValuationSummary>> GetValuationSummary();
     }
 }

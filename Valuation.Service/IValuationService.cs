@@ -8,6 +8,7 @@ namespace Valuation.Service
     public interface IValuationService
     {
         Task ValuePortfolio(DateTime upToDateTime);
+        Task<IEnumerable<ValuationSummary>> GetValuationSummary();
     }
 
 }

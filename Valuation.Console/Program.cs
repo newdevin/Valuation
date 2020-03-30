@@ -43,9 +43,12 @@ namespace Valuation.Console
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddHostedService<Worker>();
+
                 services.AddAutoMapper(typeof(Worker));
+
                 var conStr = hostContext.Configuration.GetConnectionString("PicassoDbConnectionString");
                 var uriString = hostContext.Configuration["WorldTradingDataUri"];
+
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr),ServiceLifetime.Transient);
 
                 services.AddTransient<IEndOfDayPriceRepository, EndOfDayPriceRepository>();
