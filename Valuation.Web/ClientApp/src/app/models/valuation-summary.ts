@@ -1,8 +1,8 @@
-export class ValuationSummary {
-    day : Date
-    valuationInGbp : number
-    totalCostInGbp : number
-    totalSellInGbp : number
-    totalRealisedInGbp : number
-    totalProfitInGbp : number
+export class Summary {
+    timeSeries : Date[]
+    valuation : number[]
+    cost : number[]
+    sold : number[]
+    realised : number[]
+    profit : number[]
 }
