@@ -19,11 +19,11 @@ namespace Valuation.Service
                     return new ValuationSummary
                     {
                         Day = g.Key,
-                        TotalCostInGBP = totalCostInGbp,
+                        TotalCostInGbp = totalCostInGbp,
                         ValuationInGbp = totalValuation,
-                        TotalRealisedInGBP = totalRealised,
-                        TotalSellInGBP = totalSellInGbp,
-                        TotalProfitInGBP = totalValuation + totalSellInGbp - totalCostInGbp
+                        TotalRealisedInGbp = totalRealised,
+                        TotalSellInGbp = totalSellInGbp,
+                        TotalProfitInGbp = totalValuation + totalSellInGbp - totalCostInGbp
                     };
                 });
             return summary;

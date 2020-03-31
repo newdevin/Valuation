@@ -41,25 +41,25 @@ namespace Valuation.Service.Test
             Assert.Equal(3, actual.Count());
             var first = actual.First(a => a.Day == day1);
             Assert.Equal(1050, first.ValuationInGbp);
-            Assert.Equal(1106, first.TotalCostInGBP);
-            Assert.Equal(-56, first.TotalProfitInGBP);
-            Assert.Equal(0, first.TotalSellInGBP);
-            Assert.Equal(0, first.TotalRealisedInGBP);
+            Assert.Equal(1106, first.TotalCostInGbp);
+            Assert.Equal(-56, first.TotalProfitInGbp);
+            Assert.Equal(0, first.TotalSellInGbp);
+            Assert.Equal(0, first.TotalRealisedInGbp);
 
             var second = actual.First(a => a.Day == day2);
             Assert.Equal(1200, second.ValuationInGbp);
-            Assert.Equal(1106, second.TotalCostInGBP);
-            Assert.Equal(0, second.TotalSellInGBP);
-            Assert.Equal(94, second.TotalProfitInGBP);
-            Assert.Equal(0, second.TotalRealisedInGBP);
+            Assert.Equal(1106, second.TotalCostInGbp);
+            Assert.Equal(0, second.TotalSellInGbp);
+            Assert.Equal(94, second.TotalProfitInGbp);
+            Assert.Equal(0, second.TotalRealisedInGbp);
 
 
             var third = actual.First(a => a.Day == day3);
             Assert.Equal(105, third.ValuationInGbp);
-            Assert.Equal(1106, third.TotalCostInGBP);
-            Assert.Equal(1500, third.TotalSellInGBP);
-            Assert.Equal(499, third.TotalProfitInGBP);
-            Assert.Equal(499, third.TotalRealisedInGBP);
+            Assert.Equal(1106, third.TotalCostInGbp);
+            Assert.Equal(1500, third.TotalSellInGbp);
+            Assert.Equal(499, third.TotalProfitInGbp);
+            Assert.Equal(499, third.TotalRealisedInGbp);
 
 
         }

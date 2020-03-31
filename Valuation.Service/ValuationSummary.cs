@@ -6,10 +6,10 @@ namespace Valuation.Service
     {
         public int Id { get; set; }
         public DateTime Day { get; set; }
-        public decimal TotalCostInGBP { get; set; }
+        public decimal TotalCostInGbp { get; set; }
         public decimal ValuationInGbp { get; set; }
-        public decimal TotalRealisedInGBP { get; set; }
-        public decimal TotalSellInGBP { get; set; }
-        public decimal TotalProfitInGBP { get; set; }
+        public decimal TotalRealisedInGbp { get; set; }
+        public decimal TotalSellInGbp { get; set; }
+        public decimal TotalProfitInGbp { get; set; }
     }
 }
