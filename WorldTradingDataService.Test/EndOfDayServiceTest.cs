@@ -1,4 +1,5 @@
 ﻿using LanguageExt;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System;
 using System.Collections;
@@ -23,14 +24,16 @@ namespace WorldTradingData.Service.Test
         IEndOfDayPriceRepository endOfDayRepository;
         IListingService listingService;
         IHttpClientFactory httpClientFactory;
+        ILogger logger;
         public EndOfDayServiceTest()
         {
             worldTradingDataService = Substitute.For<IWorldTradingDataService>();
             endOfDayRepository = Substitute.For<IEndOfDayPriceRepository>();
             listingService = Substitute.For<IListingService>();
             httpClientFactory = Substitute.For<IHttpClientFactory>();
+            logger = Substitute.For<ILogger>();
 
-            endOfDayService = new EndOfDayPriceDownloadService(worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
+            endOfDayService = new EndOfDayPriceDownloadService(logger, worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
         }
 
         private IEnumerable<Tuple<Listing, DateTime?>> GetListings()

@@ -6,19 +6,22 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Valuation.Domain;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace Valuation.WorldTradingData.Service
 {
     public class EndOfDayPriceDownloadService : IEndOfDayPriceDownloadService
     {
+        private readonly ILogger logger;
         private readonly IWorldTradingDataService worldTradingDataService;
         private readonly IEndOfDayPriceRepository endOfDayRepository;
         private readonly IListingService listingService;
         private readonly IHttpClientFactory httpClientFactory;
 
-        public EndOfDayPriceDownloadService(IWorldTradingDataService worldTradingDataService,
+        public EndOfDayPriceDownloadService(ILogger logger, IWorldTradingDataService worldTradingDataService,
             IEndOfDayPriceRepository endOfDayRepository, IListingService listingService, IHttpClientFactory httpClientFactory)
         {
+            this.logger = logger;
             this.worldTradingDataService = worldTradingDataService;
             this.endOfDayRepository = endOfDayRepository;
             this.listingService = listingService;
@@ -70,25 +73,25 @@ namespace Valuation.WorldTradingData.Service
                     if (decimal.TryParse(p[1], out decimal price))
                     {
                         if (currency == "GBP")
-                            price = price / 100;
+                            price /= 100;
                         openPrice = price;
                     }
                     if (decimal.TryParse(p[2], out price))
                     {
                         if (currency == "GBP")
-                            price = price / 100;
+                            price /= 100;
                         closePrice = price;
                     }
                     if (decimal.TryParse(p[3], out price))
                     {
                         if (currency == "GBP")
-                            price = price / 100;
+                            price /= 100;
                         highPrice = price;
                     }
                     if (decimal.TryParse(p[4], out price))
                     {
                         if (currency == "GBP")
-                            price = price / 100;
+                            price /= 100;
                         lowPrice = price;
                     }
 
@@ -96,10 +99,13 @@ namespace Valuation.WorldTradingData.Service
                     {
                         volume = vol;
                     }
-
+                    if (!closePrice.HasValue)
+                        logger.LogWarning($"closePrice has no value for: {uri}");
                     return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
                 });
             }
+            else
+                logger.LogWarning($"Resposnse for: {uri} was : {response.StatusCode}");
             return Array.Empty<EndOfDayPrice>();
         }
 
