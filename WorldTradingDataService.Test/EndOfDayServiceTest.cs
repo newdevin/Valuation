@@ -24,14 +24,14 @@ namespace WorldTradingData.Service.Test
         IEndOfDayPriceRepository endOfDayRepository;
         IListingService listingService;
         IHttpClientFactory httpClientFactory;
-        ILogger logger;
+        ILogger<EndOfDayPriceDownloadService> logger;
         public EndOfDayServiceTest()
         {
             worldTradingDataService = Substitute.For<IWorldTradingDataService>();
             endOfDayRepository = Substitute.For<IEndOfDayPriceRepository>();
             listingService = Substitute.For<IListingService>();
             httpClientFactory = Substitute.For<IHttpClientFactory>();
-            logger = Substitute.For<ILogger>();
+            logger = Substitute.For<ILogger<EndOfDayPriceDownloadService>>();
 
             endOfDayService = new EndOfDayPriceDownloadService(logger, worldTradingDataService, endOfDayRepository, listingService, httpClientFactory);
         }

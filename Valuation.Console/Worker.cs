@@ -43,16 +43,25 @@ namespace Valuation.Console
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                await DoWork(cancellationToken);
-                if (AllDownloadSucceeded())
+
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    await valuationService.ValuePortfolio(DateTime.Now.AddDays(-1));
-                    await Task.Delay(GetNextRunTime());
+                    await DoWork(cancellationToken);
+                    if (AllDownloadSucceeded())
+                    {
+                        await valuationService.ValuePortfolio(DateTime.Now.AddDays(-1));
+                        await Task.Delay(GetNextRunTime());
+                    }
+                    else
+                        await Task.Delay(60_000);
                 }
-                else
-                    await Task.Delay(60_000);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e.ToString());
+
             }
         }
 

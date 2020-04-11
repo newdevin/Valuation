@@ -18,7 +18,7 @@ namespace Valuation.WorldTradingData.Service
         private readonly IListingService listingService;
         private readonly IHttpClientFactory httpClientFactory;
 
-        public EndOfDayPriceDownloadService(ILogger logger, IWorldTradingDataService worldTradingDataService,
+        public EndOfDayPriceDownloadService(ILogger<EndOfDayPriceDownloadService> logger, IWorldTradingDataService worldTradingDataService,
             IEndOfDayPriceRepository endOfDayRepository, IListingService listingService, IHttpClientFactory httpClientFactory)
         {
             this.logger = logger;
@@ -102,7 +102,7 @@ namespace Valuation.WorldTradingData.Service
                     if (!closePrice.HasValue)
                         logger.LogWarning($"closePrice has no value for: {uri}");
                     return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
-                });
+                }).Where(eod => eod.ClosePrice.HasValue);
             }
             else
                 logger.LogWarning($"Resposnse for: {uri} was : {response.StatusCode}");

@@ -14,6 +14,7 @@ using Valuation.Infrastructure;
 using IObjectMapper = Valuation.Infrastructure.IObjectMapper;
 using Serilog;
 using Serilog.Events;
+using System.IO;
 
 namespace Valuation.Console
 {
@@ -30,12 +31,14 @@ namespace Valuation.Console
             .UseWindowsService()
             .ConfigureLogging(builder =>
             {
+                var path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                var logFile = Path.Combine(path, "Valuation.Log");
                 var logConfiguration = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File("Valuation.Log", LogEventLevel.Warning, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 5_000_000, retainedFileCountLimit: 5)
+                .WriteTo.File(logFile, LogEventLevel.Warning, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 5_000_000, retainedFileCountLimit: 5)
                 .CreateLogger();
 
                 builder.AddSerilog(logConfiguration, true);
