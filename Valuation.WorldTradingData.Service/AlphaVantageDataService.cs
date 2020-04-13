@@ -2,41 +2,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Valuation.Domain;
 
 namespace Valuation.WorldTradingData.Service
 {
-    public class WorldTradingDataService : ITradingDataService
+    public class AlphaVantageDataService : ITradingDataService
     {
+        
         private readonly Uri baseUri;
-        private readonly IApiRepository worldTradingDataRepository;
-        private string token;
+        private readonly IApiRepository tradingDataRepository;
+        private List<string> tokens;
+        private static int index;
+        private static readonly object lockObject = new object();
 
-        public WorldTradingDataService( Uri baseUri, IApiRepository worldTradingDataRepository)
+        public AlphaVantageDataService( Uri baseUri, IApiRepository iExCloudDataRepository)
         {
         
             this.baseUri = baseUri;
-            this.worldTradingDataRepository = worldTradingDataRepository;
-            GetToken();
+            this.tradingDataRepository = iExCloudDataRepository;
+            GetTokens();
         }
-
-        public void GetToken()
+        public void GetTokens()
         {
-            if(token is null)
+            if (tokens is null)
             {
-                var task = worldTradingDataRepository.GetTokens("WorldTradingData");
-                token = task.Result.First();
+                var task = tradingDataRepository.GetTokens("WorldTradingData");
+                tokens = task.Result;
             }
         }
 
         public Uri GetCurrencyRateUri(DateTime? day, string symbol)
         {
-            
-            var uriString = $@"{baseUri}/api/v1/forex_history?api_token={token}&base={symbol}&convert_to=GBP&output=csv";
-            if (day.HasValue)
-                uriString += $"&date_from={day.Value:yyyy-MM-dd}";
+            //https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=EUR&to_symbol=USD&apikey=demo&datatype=csv
+            var size = "compact";
+            if (day is null || ((DateTime.Now.Date - day.Value.Date).TotalDays > 100))
+                size = "full";
+            var uriString = $"{baseUri}/query?function=FX_DAILY&from_symbol={symbol}&to_symbol=GBP&apikey={GetKey()}&datatype=csv&outputsize={size}";
 
             return new Uri(uriString);
 
@@ -44,21 +46,33 @@ namespace Valuation.WorldTradingData.Service
 
         public Uri GetEndOfDayPriceUri(DateTime? dateTime, string symbol, string suffix)
         {
-            var uriString = $"{baseUri}api/v1/history?output=csv&api_token={token}";
-            if (suffix != null)
-                uriString += $"&symbol={symbol}.{suffix}";
-            else
-                uriString += $"&symbol={symbol}";
-            if (dateTime.HasValue)
-                uriString += $"&date_from={dateTime.Value:yyyy-MM-dd}";
+            //https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=IBM&apikey=demo&datatype=csv&outputsize=compact
+            var sym = $"{symbol}";
+            if (!string.IsNullOrEmpty(suffix))
+                sym = $"{sym}.{suffix}";
+            var size = "compact";
+            if (dateTime is null || ((DateTime.Now.Date - dateTime.Value.Date).TotalDays > 100))
+                size = "full";
 
+            var uriString = $"{baseUri}/query?function=TIME_SERIES_DAILY&symbol={sym}&apikey={GetKey()}&datatype=csv&outputsize={size}";
             return new Uri(uriString);
 
         }
 
+        private string GetKey()
+        {
+            lock (lockObject)
+            {
+                if (index >= tokens.Count())
+                    index = 0;
+                return tokens[index++];
+            }
+        }
+
         public IEnumerable<EndOfDayPrice> GetPrices(IEnumerable<string> data, int listingId, string currency)
         {
-            //Date,Open,Close,High,Low,Volume
+            //timestamp,open,high,low,close,volume
+
             return data
                     .Where(d => !string.IsNullOrWhiteSpace(d))
                     .Select(d =>
@@ -81,25 +95,26 @@ namespace Valuation.WorldTradingData.Service
                         {
                             if (currency == "GBP")
                                 price /= 100;
-                            closePrice = price;
+                            highPrice = price;
                         }
                         if (decimal.TryParse(p[3], out price))
                         {
                             if (currency == "GBP")
                                 price /= 100;
-                            highPrice = price;
+                            lowPrice = price;
                         }
                         if (decimal.TryParse(p[4], out price))
                         {
                             if (currency == "GBP")
                                 price /= 100;
-                            lowPrice = price;
+                            closePrice = price;
                         }
 
                         if (int.TryParse(p[5], out int vol))
                         {
                             volume = vol;
                         }
+                        
                         return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
                     }).Where(eod => eod.ClosePrice.HasValue);
         }
@@ -112,7 +127,7 @@ namespace Valuation.WorldTradingData.Service
                    {
                        var p = d.Split(',', StringSplitOptions.None);
                        DateTime.TryParse(p[0], out DateTime day);
-                       decimal.TryParse(p[1], out decimal rate);
+                       decimal.TryParse(p[4], out decimal rate);
                        return new CurrencyRate { From = symbol, Day = day, To = "GBP", Rate = rate };
                    });
         }

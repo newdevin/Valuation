@@ -15,6 +15,7 @@ using IObjectMapper = Valuation.Infrastructure.IObjectMapper;
 using Serilog;
 using Serilog.Events;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace Valuation.Console
 {
@@ -56,7 +57,7 @@ namespace Valuation.Console
 
                 services.AddTransient<IEndOfDayPriceRepository, EndOfDayPriceRepository>();
                 services.AddTransient<IListingRepository, ListingRepository>();
-                services.AddTransient<IWorldTradingDataRepository, WorldTradingDataRepository>();
+                services.AddTransient<IApiRepository, ApiRepository>();
                 services.AddTransient<IEndOfDayLogRepository, EndOfDayLogRepository>();
                 services.AddTransient<ICurrencyRatesLogRepository, CurrencyRatesLogRepository>();
                 services.AddTransient<ICurrencyRateRepository, CurrencyRateRepository>();
@@ -68,8 +69,8 @@ namespace Valuation.Console
                 services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>();
                 services.AddTransient<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>();
                 services.AddTransient<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
-                services.AddTransient<IWorldTradingDataService, WorldTradingDataService>(s =>
-                new WorldTradingDataService(new System.Uri(uriString), s.GetService<IWorldTradingDataRepository>()));
+                services.AddTransient<ITradingDataService, WorldTradingDataService>(s =>
+                new WorldTradingDataService( new System.Uri(uriString), s.GetService<IApiRepository>()));
                 services.AddTransient<IListingService, ListingService>();
                 services.AddTransient<IEndOfDayLogService, EndOfDayLogService>();
                 services.AddTransient<ICurrencyRatesLogService, CurrencyRatesLogService>();

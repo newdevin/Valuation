@@ -12,11 +12,11 @@ namespace Valuation.WorldTradingData.Service
 {
     public class CurrencyRatesDownloadService : ICurrencyRatesDownloadService
     {
-        private readonly IWorldTradingDataService worldTradingDataService;
+        private readonly ITradingDataService worldTradingDataService;
         private readonly ICurrencyRateService currencyRateService;
         private readonly IHttpClientFactory httpClientFactory;
 
-        public CurrencyRatesDownloadService(IWorldTradingDataService worldTradingDataService,
+        public CurrencyRatesDownloadService(ITradingDataService worldTradingDataService,
             ICurrencyRateService currencyRateService,
             IHttpClientFactory httpClientFactory)
         {
@@ -57,15 +57,7 @@ namespace Valuation.WorldTradingData.Service
                 //Date,rate
                 var allLines = data.Split("\n");
                 var dataLines = allLines.Skip(1);
-                return dataLines
-                    .Where(d => !string.IsNullOrWhiteSpace(d))
-                    .Select(d =>
-                    {
-                        var p = d.Split(',', StringSplitOptions.None);
-                        DateTime.TryParse(p[0], out DateTime day);
-                        decimal.TryParse(p[1], out decimal rate);
-                        return new CurrencyRate { From = symbol, Day = day, To = "GBP", Rate = rate };
-                    });
+                return worldTradingDataService.GetRates(dataLines, symbol);
             }
             return Array.Empty<CurrencyRate>();
         }

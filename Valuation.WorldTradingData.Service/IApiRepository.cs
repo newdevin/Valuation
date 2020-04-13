@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Valuation.WorldTradingData.Service
 {
-    public interface IWorldTradingDataRepository
+    public interface IApiRepository
     {
-        string GetToken();
+        Task<List<string>> GetTokens(string name);
     }
 }

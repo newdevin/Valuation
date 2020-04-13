@@ -10,18 +10,18 @@ using static LanguageExt.Prelude;
 
 namespace WorldTradingData.Service.Test
 {
-    public class WorldTradingDataServiceTest
+    public class AlphaVantageDataServiceTest
     {
-        WorldTradingDataService worldTradingDataService;
-        public const string Base_Uri = @"https://api.worldtradingdata.com";
+        AlphaVantageDataService AlphaVantageDataService;
+        public const string Base_Uri = @"https://alphavantage.co";
         public List<string> Tokens = new List<string> { "LM0o123Ret" };
         
         IApiRepository worldTradingDataRepository;
-        public WorldTradingDataServiceTest()
+        public AlphaVantageDataServiceTest()
         {
             worldTradingDataRepository = Substitute.For<IApiRepository>();
             worldTradingDataRepository.GetTokens(Arg.Any<string>()).Returns(Tokens);
-            worldTradingDataService = new WorldTradingDataService(new Uri(Base_Uri), worldTradingDataRepository);
+            AlphaVantageDataService = new AlphaVantageDataService(new Uri(Base_Uri), worldTradingDataRepository);
         }
 
         [Fact]
@@ -30,50 +30,58 @@ namespace WorldTradingData.Service.Test
 
 
             string symbol = "ABC";
-            var uri = worldTradingDataService.GetEndOfDayPriceUri(null, symbol, null);
+            string size = "full";
+            var uri = AlphaVantageDataService.GetEndOfDayPriceUri(null, symbol, null);
 
             var query = uri.Query.Replace("?", "");
             Assert.NotNull(query);
 
             var tokens = GetTokens(query);
-            Assert.True(tokens.ContainsKey("output"));
-            Assert.Equal("csv", tokens["output"]);
+            Assert.True(tokens.ContainsKey("datatype"));
+            Assert.Equal("csv", tokens["datatype"]);
 
-            Assert.True(tokens.ContainsKey("api_token"));
-            Assert.Equal(Tokens.First(), tokens["api_token"]);
+            Assert.True(tokens.ContainsKey("apikey"));
+            Assert.Equal(Tokens.First(), tokens["apikey"]);
 
             Assert.True(tokens.ContainsKey("symbol"));
             Assert.Equal(symbol, tokens["symbol"]);
 
-            var uriPathOnly = uri.ToString().Substring(0, uri.ToString().IndexOf("?"));
-            Assert.Equal($"{Base_Uri}/api/v1/history", uriPathOnly);
+            Assert.True(tokens.ContainsKey("outputsize"));
+            Assert.Equal(size, tokens["outputsize"]);
+
+            Assert.True(tokens.ContainsKey("function"));
+            Assert.Equal("TIME_SERIES_DAILY", tokens["function"]);
+                     
         }
 
         [Fact]
         public void ShouldReturnCorrectUriWhenDateIsSpecified()
         {
             string symbol = "ABC";
-            var dateString = "2020-03-01";
-            var uri = worldTradingDataService.GetEndOfDayPriceUri(DateTime.Parse(dateString), symbol, null);
+            var dateString = DateTime.Now.AddDays(-10).ToString("yyyy-MM-dd");
+            string size = "compact";
+            var uri = AlphaVantageDataService.GetEndOfDayPriceUri(null, symbol, null);
 
             var query = uri.Query.Replace("?", "");
             Assert.NotNull(query);
 
             var tokens = GetTokens(query);
-            Assert.True(tokens.ContainsKey("output"));
-            Assert.Equal("csv", tokens["output"]);
+            Assert.True(tokens.ContainsKey("datatype"));
+            Assert.Equal("csv", tokens["datatype"]);
 
-            Assert.True(tokens.ContainsKey("api_token"));
-            Assert.Equal(Tokens.First(), tokens["api_token"]);
+            Assert.True(tokens.ContainsKey("apikey"));
+            Assert.Equal(Tokens.First(), tokens["apikey"]);
 
             Assert.True(tokens.ContainsKey("symbol"));
             Assert.Equal(symbol, tokens["symbol"]);
 
-            Assert.True(tokens.ContainsKey("date_from"));
-            Assert.Equal(dateString, tokens["date_from"]);
+            Assert.True(tokens.ContainsKey("outputsize"));
+            Assert.Equal(size, tokens["outputsize"]);
 
-            var uriPathOnly = uri.ToString().Substring(0, uri.ToString().IndexOf("?"));
-            Assert.Equal($"{Base_Uri}/api/v1/history", uriPathOnly);
+            Assert.True(tokens.ContainsKey("function"));
+            Assert.Equal("TIME_SERIES_DAILY", tokens["function"]);
+
+            
 
         }
 
@@ -97,11 +105,11 @@ namespace WorldTradingData.Service.Test
         {
             var curDirectory = Directory.GetCurrentDirectory();
             var pathToDataDirectory = Path.Combine(curDirectory, "data");
-            var filePath = Path.Combine(pathToDataDirectory, "endOfDayPrice.txt");
+            var filePath = Path.Combine(pathToDataDirectory, "endOfDayPrice - alpha.txt");
             var contents = File.ReadAllLines(filePath);
             var data = contents.Skip(1);
 
-            var actual = worldTradingDataService.GetPrices(data, 1, "USD");
+            var actual = AlphaVantageDataService.GetPrices(data, 1, "USD");
 
             Assert.Equal(3, actual.Count());
 

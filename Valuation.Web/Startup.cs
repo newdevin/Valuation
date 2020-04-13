@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Valuation.Infrastructure;
 using Valuation.Repository;
@@ -53,7 +54,7 @@ namespace Valuation.Web
 
             services.AddScoped<IEndOfDayPriceRepository, EndOfDayPriceRepository>();
             services.AddScoped<IListingRepository, ListingRepository>();
-            services.AddScoped<IWorldTradingDataRepository, WorldTradingDataRepository>();
+            services.AddScoped<IApiRepository, ApiRepository>();
             services.AddScoped<IEndOfDayLogRepository, EndOfDayLogRepository>();
             services.AddScoped<ICurrencyRatesLogRepository, CurrencyRatesLogRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
@@ -66,8 +67,8 @@ namespace Valuation.Web
             services.AddScoped<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>();
             services.AddScoped<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>();
             services.AddScoped<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
-            services.AddScoped<IWorldTradingDataService, WorldTradingDataService>(s =>
-            new WorldTradingDataService(new System.Uri(uriString), s.GetService<IWorldTradingDataRepository>()));
+            services.AddScoped<ITradingDataService, WorldTradingDataService>(s =>
+            new WorldTradingDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
             services.AddScoped<IListingService, ListingService>();
             services.AddScoped<IEndOfDayLogService, EndOfDayLogService>();
             services.AddScoped<ICurrencyRatesLogService, CurrencyRatesLogService>();
