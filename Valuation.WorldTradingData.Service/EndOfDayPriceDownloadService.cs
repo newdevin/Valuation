@@ -33,12 +33,11 @@ namespace Valuation.WorldTradingData.Service
         {
             var listingsWithDate = await listingService.GetActiveListingWithLastEodPriceDateTime();
             var queue = new ConcurrentQueue<EndOfDayPrice>();
-            var task = listingsWithDate.Select(listingWithDate =>
+            var tasks = listingsWithDate.Select(listingWithDate =>
             {
-                return Task.Run(async () =>
+                // return Task.Run(async () => 
+                return new Task(async () => //*** This is for AlphaVantage Only ***//
                 {
-                    if (delay.HasValue)
-                        await Task.Delay(TimeSpan.FromSeconds(delay.Value));
                     var uri = tradingDataService.GetEndOfDayPriceUri(listingWithDate.Item2?.AddDays(1), listingWithDate.Item1.Symbol, listingWithDate.Item1.Suffix);
                     var endOfDayPrices = await GetEndOfDayPrice(listingWithDate.Item1.Id, uri, listingWithDate.Item1.Currency.Symbol);
                     foreach (var eodPrice in endOfDayPrices)
@@ -47,22 +46,32 @@ namespace Valuation.WorldTradingData.Service
                     }
                 });
             });
-            await Task.WhenAll(task);
+
+            //******* AlphaVantage specific code start********//
+            //AlphaVantage will only allow 5 call per minute
+            foreach (var tsk in tasks)
+            {
+                tsk.RunSynchronously();
+                if (delay.HasValue)
+                    await Task.Delay(TimeSpan.FromSeconds(delay.Value));
+            }
+            //******* AlphaVantage specific code end********//
+            //await Task.WhenAll(tasks);
             await endOfDayRepository.Save(queue.Select(eodPrice => eodPrice));
         }
         private async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPrice(int listingId, Uri uri, string currency)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
-
+            
             using var httpClient = httpClientFactory.CreateClient();
             var response = await httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsStringAsync();
-                
+
                 var allLines = data.Split("\n");
                 var dataLines = allLines.Skip(1);
-                return tradingDataService.GetPrices(dataLines,listingId, currency);
+                return tradingDataService.GetPrices(dataLines, listingId, currency);
             }
             else
                 logger.LogWarning($"Resposnse for: {uri} was : {response.StatusCode}");

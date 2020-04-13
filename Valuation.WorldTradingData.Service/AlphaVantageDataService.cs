@@ -11,23 +11,23 @@ namespace Valuation.WorldTradingData.Service
     {
         
         private readonly Uri baseUri;
-        private readonly IApiRepository tradingDataRepository;
+        private readonly IApiRepository apiRepository;
         private List<string> tokens;
         private static int index;
         private static readonly object lockObject = new object();
 
-        public AlphaVantageDataService( Uri baseUri, IApiRepository iExCloudDataRepository)
+        public AlphaVantageDataService( Uri baseUri, IApiRepository apiRepository)
         {
         
             this.baseUri = baseUri;
-            this.tradingDataRepository = iExCloudDataRepository;
+            this.apiRepository = apiRepository;
             GetTokens();
         }
         public void GetTokens()
         {
             if (tokens is null)
             {
-                var task = tradingDataRepository.GetTokens("WorldTradingData");
+                var task = apiRepository.GetTokens("AlphaVantage");
                 tokens = task.Result;
             }
         }
@@ -38,7 +38,7 @@ namespace Valuation.WorldTradingData.Service
             var size = "compact";
             if (day is null || ((DateTime.Now.Date - day.Value.Date).TotalDays > 100))
                 size = "full";
-            var uriString = $"{baseUri}/query?function=FX_DAILY&from_symbol={symbol}&to_symbol=GBP&apikey={GetKey()}&datatype=csv&outputsize={size}";
+            var uriString = $"{baseUri}query?function=FX_DAILY&from_symbol={symbol}&to_symbol=GBP&apikey={GetKey()}&datatype=csv&outputsize={size}";
 
             return new Uri(uriString);
 
@@ -54,7 +54,7 @@ namespace Valuation.WorldTradingData.Service
             if (dateTime is null || ((DateTime.Now.Date - dateTime.Value.Date).TotalDays > 100))
                 size = "full";
 
-            var uriString = $"{baseUri}/query?function=TIME_SERIES_DAILY&symbol={sym}&apikey={GetKey()}&datatype=csv&outputsize={size}";
+            var uriString = $"{baseUri}query?function=TIME_SERIES_DAILY&symbol={sym}&apikey={GetKey()}&datatype=csv&outputsize={size}";
             return new Uri(uriString);
 
         }

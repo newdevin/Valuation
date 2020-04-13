@@ -12,27 +12,30 @@ namespace Valuation.WorldTradingData.Service
 {
     public class CurrencyRatesDownloadService : ICurrencyRatesDownloadService
     {
-        private readonly ITradingDataService worldTradingDataService;
+        private readonly ITradingDataService tradingDataService;
         private readonly ICurrencyRateService currencyRateService;
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly int? delay;
 
-        public CurrencyRatesDownloadService(ITradingDataService worldTradingDataService,
+        public CurrencyRatesDownloadService(ITradingDataService tradingDataService,
             ICurrencyRateService currencyRateService,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory, int? delay)
         {
-            this.worldTradingDataService = worldTradingDataService;
+            this.tradingDataService = tradingDataService;
             this.currencyRateService = currencyRateService;
             this.httpClientFactory = httpClientFactory;
+            this.delay = delay;
         }
         public async Task DownloadCurrenctRates()
         {
             var currenciesWithDate = await currencyRateService.GetActiveCurrenciesWithLastDownloadedDate();
             var queue = new ConcurrentQueue<CurrencyRate>();
-            var task = currenciesWithDate.Select(c =>
+            var tasks = currenciesWithDate.Select(c =>
             {
-                return Task.Run(async () =>
+                //return Task.Run(async () =>
+                return new Task(async () =>
                 {
-                    var uri = worldTradingDataService.GetCurrencyRateUri(c.Item2?.AddDays(1), c.Item1.Symbol);
+                    var uri = tradingDataService.GetCurrencyRateUri(c.Item2?.AddDays(1), c.Item1.Symbol);
                     var currencyRates = await GetCurrencyRates(c.Item1.Symbol, uri);
                     foreach(var rate in currencyRates)
                     {
@@ -41,7 +44,16 @@ namespace Valuation.WorldTradingData.Service
                 });
             });
 
-            await Task.WhenAll(task);
+            //******* AlphaVantage specific code start********//
+            //AlphaVantage will only allow 5 call per minute
+            foreach (var tsk in tasks)
+            {
+                tsk.RunSynchronously();
+                if (delay.HasValue)
+                    await Task.Delay(TimeSpan.FromSeconds(delay.Value));
+            }
+            //******* AlphaVantage specific code end********//
+            //await Task.WhenAll(tasks);
             await currencyRateService.Save(queue.Select(rate => rate));
 
         }
@@ -57,7 +69,7 @@ namespace Valuation.WorldTradingData.Service
                 //Date,rate
                 var allLines = data.Split("\n");
                 var dataLines = allLines.Skip(1);
-                return worldTradingDataService.GetRates(dataLines, symbol);
+                return tradingDataService.GetRates(dataLines, symbol);
             }
             return Array.Empty<CurrencyRate>();
         }

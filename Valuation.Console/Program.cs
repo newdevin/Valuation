@@ -16,6 +16,7 @@ using Serilog;
 using Serilog.Events;
 using System.IO;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 namespace Valuation.Console
 {
@@ -51,9 +52,10 @@ namespace Valuation.Console
                 services.AddAutoMapper(typeof(Worker));
 
                 var conStr = hostContext.Configuration.GetConnectionString("PicassoDbConnectionString");
-                var uriString = hostContext.Configuration["WorldTradingDataUri"];
+                var uriString = hostContext.Configuration["AlphaVantage"];
+                int.TryParse(hostContext.Configuration["delay"], out int delay);
 
-                services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr),ServiceLifetime.Transient);
+                services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr), ServiceLifetime.Transient);
 
                 services.AddTransient<IEndOfDayPriceRepository, EndOfDayPriceRepository>();
                 services.AddTransient<IListingRepository, ListingRepository>();
@@ -64,13 +66,20 @@ namespace Valuation.Console
                 services.AddTransient<IValuationRepository, ValuationRepository>();
                 services.AddTransient<IBuyTradeRepository, BuyTradeRepository>();
                 services.AddTransient<ISellTradeRepository, SellTradeRepository>();
-
+                services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>(s =>
+                {
+                    return new EndOfDayPriceDownloadService(s.GetService<ILogger<EndOfDayPriceDownloadService>>(), s.GetService<ITradingDataService>(),
+                        s.GetService<IEndOfDayPriceRepository>(), s.GetService<IListingService>(), s.GetService<IHttpClientFactory>(), delay);
+                });
                 services.AddHttpClient();
-                services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>();
-                services.AddTransient<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>();
+                services.AddTransient<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>(s =>
+                {
+                    return new CurrencyRatesDownloadService(s.GetService<ITradingDataService>(), s.GetService<ICurrencyRateService>(),
+                        s.GetService<IHttpClientFactory>(), delay);
+                });
                 services.AddTransient<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
-                services.AddTransient<ITradingDataService, WorldTradingDataService>(s =>
-                new WorldTradingDataService( new System.Uri(uriString), s.GetService<IApiRepository>()));
+                services.AddTransient<ITradingDataService, AlphaVantageDataService>(s =>
+                new AlphaVantageDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
                 services.AddTransient<IListingService, ListingService>();
                 services.AddTransient<IEndOfDayLogService, EndOfDayLogService>();
                 services.AddTransient<ICurrencyRatesLogService, CurrencyRatesLogService>();
@@ -80,7 +89,7 @@ namespace Valuation.Console
                 services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
                 services.AddTransient<ValuationCalculator>();
                 services.AddTransient<ValuationSummaryCalculator>();
-                
+
 
             });
 

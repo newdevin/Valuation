@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using System.Net.Http;
 using Valuation.Infrastructure;
 using Valuation.Repository;
 using Valuation.Service;
@@ -46,7 +47,8 @@ namespace Valuation.Web
         private void AddApplicationServices(IServiceCollection services)
         {
             var conStr = Configuration.GetConnectionString("PicassoDbConnectionString");
-            var uriString = Configuration["WorldTradingDataUri"];
+            var uriString = Configuration["AlphaVantage"];
+            int.TryParse(Configuration["delay"], out int delay);
 
             services.AddAutoMapper(typeof(Startup));
 
@@ -62,13 +64,18 @@ namespace Valuation.Web
             services.AddScoped<IValuationRepository, ValuationRepository>();
             services.AddScoped<IBuyTradeRepository, BuyTradeRepository>();
             services.AddScoped<ISellTradeRepository, SellTradeRepository>();
+            services.AddScoped<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>(s =>
+            {
+                return new EndOfDayPriceDownloadService(s.GetService<ILogger<EndOfDayPriceDownloadService>>(), s.GetService<ITradingDataService>(),
+                    s.GetService<IEndOfDayPriceRepository>(), s.GetService<IListingService>(), s.GetService<IHttpClientFactory>(), delay);
+            });
 
             services.AddHttpClient();
             services.AddScoped<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>();
             services.AddScoped<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>();
             services.AddScoped<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
-            services.AddScoped<ITradingDataService, WorldTradingDataService>(s =>
-            new WorldTradingDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
+            services.AddScoped<ITradingDataService, AlphaVantageDataService>(s =>
+            new AlphaVantageDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
             services.AddScoped<IListingService, ListingService>();
             services.AddScoped<IEndOfDayLogService, EndOfDayLogService>();
             services.AddScoped<ICurrencyRatesLogService, CurrencyRatesLogService>();
