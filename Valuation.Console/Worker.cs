@@ -17,11 +17,13 @@ namespace Valuation.Console
         private readonly ICurrencyRatesDownloadService currencyRatesDownloadService;
         private readonly ICurrencyRatesLogService currencyRatesLogService;
         private readonly IValuationService valuationService;
+        private readonly IValuationLogService valuationLogService;
         private readonly IConfiguration configuration;
         private readonly ILogger<Worker> logger;
 
         private DateTime? endOfDayPriceDownloadedDateTime;
         private DateTime? currencyRatesDownloadedDateTime;
+        private DateTime? valuationRunDateTime;
 
         public Worker(ILogger<Worker> logger,
             IEndOfDayPriceDownloadService endOfDayPriceService,
@@ -29,6 +31,7 @@ namespace Valuation.Console
             ICurrencyRatesDownloadService currencyRatesDownloadService,
             ICurrencyRatesLogService currencyRatesLogService,
             IValuationService valuationService,
+            IValuationLogService valuationLogService,
             IConfiguration configuration)
         {
             this.logger = logger;
@@ -37,6 +40,7 @@ namespace Valuation.Console
             this.currencyRatesDownloadService = currencyRatesDownloadService;
             this.currencyRatesLogService = currencyRatesLogService;
             this.valuationService = valuationService;
+            this.valuationLogService = valuationLogService;
             this.configuration = configuration;
 
         }
@@ -49,15 +53,17 @@ namespace Valuation.Console
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     await DoWork(cancellationToken);
-                    if (AllDownloadSucceeded())
+                    if (AllDownloadSucceeded() && !ValuationRunToday())
                     {
                         logger.LogInformation("Starting daily valuation");
+                        var id = await valuationLogService.ValuationServiceStarted();
                         await valuationService.ValuePortfolio(DateTime.Now.AddDays(-1));
+                        await valuationLogService.ValuationServiceCompleted(id);
+                        valuationRunDateTime = DateTime.Now.Date;
                         logger.LogInformation("Finished daily valuation");
-                        await Task.Delay(GetNextRunTime());
                     }
-                    else
-                        await Task.Delay(60_000);
+
+                    await Task.Delay(TimeSpan.FromMinutes(1));
                 }
             }
             catch (Exception e)
@@ -65,6 +71,14 @@ namespace Valuation.Console
                 logger.LogError(e.ToString());
 
             }
+        }
+
+        private bool ValuationRunToday()
+        {
+            if (valuationRunDateTime.HasValue && valuationRunDateTime.Value == DateTime.Now.Date)
+                return true;
+            else
+                return false;
         }
 
         public TimeSpan GetNextRunTime()

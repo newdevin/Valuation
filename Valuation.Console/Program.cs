@@ -58,6 +58,7 @@ namespace Valuation.Console
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr), ServiceLifetime.Transient);
 
                 services.AddTransient<IEndOfDayPriceRepository, EndOfDayPriceRepository>();
+                services.AddTransient<IValuationLogRepository, ValuationLogRepository>();
                 services.AddTransient<IListingRepository, ListingRepository>();
                 services.AddTransient<IApiRepository, ApiRepository>();
                 services.AddTransient<IEndOfDayLogRepository, EndOfDayLogRepository>();
@@ -66,6 +67,7 @@ namespace Valuation.Console
                 services.AddTransient<IValuationRepository, ValuationRepository>();
                 services.AddTransient<IBuyTradeRepository, BuyTradeRepository>();
                 services.AddTransient<ISellTradeRepository, SellTradeRepository>();
+                services.AddTransient<IValuationLogService, ValuatinLogService>();
                 services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>(s =>
                 {
                     return new EndOfDayPriceDownloadService(s.GetService<ILogger<EndOfDayPriceDownloadService>>(), s.GetService<ITradingDataService>(),
