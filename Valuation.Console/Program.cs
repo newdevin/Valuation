@@ -40,7 +40,7 @@ namespace Valuation.Console
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File(logFile, LogEventLevel.Warning, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 5_000_000, retainedFileCountLimit: 5)
+                .WriteTo.File(logFile, LogEventLevel.Information, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 5_000_000, retainedFileCountLimit: 5)
                 .CreateLogger();
 
                 builder.AddSerilog(logConfiguration, true);
