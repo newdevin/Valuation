@@ -7,7 +7,7 @@ namespace Valuation.Service
     {
         Task<int> ValuationServiceStarted();
         Task ValuationServiceCompleted(int id);
-        Task<bool> HasValuatinServiceRunOn(DateTime day);
+        Task<bool> HasValuationServiceRunOn(DateTime day);
     }
 
 }

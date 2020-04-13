@@ -53,7 +53,7 @@ namespace Valuation.Console
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     await DoWork(cancellationToken);
-                    if (AllDownloadSucceeded() && !ValuationRunToday())
+                    if (AllDownloadSucceeded() && ! await ValuationRunToday())
                     {
                         logger.LogInformation("Starting daily valuation");
                         var id = await valuationLogService.ValuationServiceStarted();
@@ -73,12 +73,19 @@ namespace Valuation.Console
             }
         }
 
-        private bool ValuationRunToday()
+        private async Task<bool> ValuationRunToday()
         {
             if (valuationRunDateTime.HasValue && valuationRunDateTime.Value == DateTime.Now.Date)
                 return true;
             else
+            {
+                if(await valuationLogService.HasValuationServiceRunOn(DateTime.Now.Date))
+                {
+                    valuationRunDateTime = DateTime.Now.Date;
+                    return true;
+                }
                 return false;
+            }
         }
 
         public TimeSpan GetNextRunTime()

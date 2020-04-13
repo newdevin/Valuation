@@ -11,7 +11,7 @@ namespace Valuation.Service
         {
             this.valuationLogRepository = valuatinoLogRepository;
         }
-        public Task<bool> HasValuatinServiceRunOn(DateTime day)
+        public Task<bool> HasValuationServiceRunOn(DateTime day)
         {
             return valuationLogRepository.HasValuationServiceRunOn(day);
         }
