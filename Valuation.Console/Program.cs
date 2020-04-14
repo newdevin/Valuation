@@ -37,7 +37,7 @@ namespace Valuation.Console
                 var logFile = Path.Combine(path, "Valuation.Log");
                 var logConfiguration = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .WriteTo.File(logFile, LogEventLevel.Information, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true, fileSizeLimitBytes: 5_000_000, retainedFileCountLimit: 5)

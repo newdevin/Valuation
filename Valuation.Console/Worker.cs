@@ -53,7 +53,7 @@ namespace Valuation.Console
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     await DoWork(cancellationToken);
-                    if (AllDownloadSucceeded() && ! await ValuationRunToday())
+                    if (AllDownloadSucceeded() && !await ValuationRunToday())
                     {
                         logger.LogInformation("Starting daily valuation");
                         var id = await valuationLogService.ValuationServiceStarted();
@@ -79,7 +79,7 @@ namespace Valuation.Console
                 return true;
             else
             {
-                if(await valuationLogService.HasValuationServiceRunOn(DateTime.Now.Date))
+                if (await valuationLogService.HasValuationServiceRunOn(DateTime.Now.Date))
                 {
                     valuationRunDateTime = DateTime.Now.Date;
                     return true;
@@ -172,15 +172,13 @@ namespace Valuation.Console
         private async Task<bool> EndOfDayPricesDownloadedToday()
         {
             if (endOfDayPriceDownloadedDateTime.HasValue && endOfDayPriceDownloadedDateTime.Value.Date == DateTime.Now.Date)
-            {
-                logger.LogInformation($"End Of Day Prices have already been downloaded today: {DateTime.Now.Date}");
                 return true;
-            }
             else
             {
                 var hasRun = await endOfDayLogService.EndOfDayPriceDownloadHasRunOn(DateTime.Now.Date);
                 if (hasRun)
                 {
+                    logger.LogInformation($"End Of Day Prices have already been downloaded today: {DateTime.Now.Date:yyyy-MM-dd}");
                     endOfDayPriceDownloadedDateTime = DateTime.Now.Date;
                 }
                 return hasRun;
@@ -190,15 +188,13 @@ namespace Valuation.Console
         private async Task<bool> CurrencyRatesDownloadedToday()
         {
             if (currencyRatesDownloadedDateTime.HasValue && currencyRatesDownloadedDateTime.Value.Date == DateTime.Now.Date)
-            {
-                logger.LogInformation($"Currency Rates have already been downloaded today: {DateTime.Now.Date}");
                 return true;
-            }
             else
             {
                 var hasRun = await currencyRatesLogService.CurrencyRatesDownloadHasRunOn(DateTime.Now.Date);
                 if (hasRun)
                 {
+                    logger.LogInformation($"Currency Rates have already been downloaded today: {DateTime.Now.Date:yyyy-MM-dd}");
                     currencyRatesDownloadedDateTime = DateTime.Now.Date;
                 }
                 return hasRun;
