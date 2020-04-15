@@ -114,12 +114,14 @@ namespace Valuation.Console
             DateTime today = DateTime.Now;
             if (today.TimeOfDay >= startTime)
             {
-                var downloadEndOfDayPricesTask = Task.Run(async () =>
+                var downloadEndOfDayPricesTask = //Task.Run(async () =>
+                    new Task(async () =>
                 {
                     if (!await EndOfDayPricesDownloadedToday().ConfigureAwait(false))
                         await DownloadEndOfPrices(today).ConfigureAwait(false);
                 });
-                var currencyRatesDownloadTask = Task.Run(async () =>
+                var currencyRatesDownloadTask = //Task.Run(async () =>
+                new Task(async () =>
                 {
                     if (!await CurrencyRatesDownloadedToday().ConfigureAwait(false))
                         await DownloadCurrencyRates(today).ConfigureAwait(false);
@@ -127,8 +129,8 @@ namespace Valuation.Console
 
                 //var tasks = new[] { downloadEndOfDayPricesTask, currencyRatesDownloadTask };
                 //await Task.WhenAll(tasks);
-                await currencyRatesDownloadTask;
-                await downloadEndOfDayPricesTask;
+                currencyRatesDownloadTask.RunSynchronously();
+                downloadEndOfDayPricesTask.RunSynchronously();
             }
             await Task.CompletedTask;
         }
