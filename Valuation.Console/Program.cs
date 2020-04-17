@@ -67,7 +67,7 @@ namespace Valuation.Console
                 services.AddTransient<IValuationRepository, ValuationRepository>();
                 services.AddTransient<IBuyTradeRepository, BuyTradeRepository>();
                 services.AddTransient<ISellTradeRepository, SellTradeRepository>();
-                services.AddTransient<IValuationLogService, ValuatinLogService>();
+                services.AddTransient<IValuationLogService, ValuationLogService>();
                 services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>(s =>
                 {
                     return new EndOfDayPriceDownloadService(s.GetService<ILogger<EndOfDayPriceDownloadService>>(), s.GetService<ITradingDataService>(),
@@ -79,6 +79,7 @@ namespace Valuation.Console
                     return new CurrencyRatesDownloadService(s.GetService<ITradingDataService>(), s.GetService<ICurrencyRateService>(),
                         s.GetService<IHttpClientFactory>(), delay);
                 });
+
                 services.AddTransient<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
                 services.AddTransient<ITradingDataService, AlphaVantageDataService>(s =>
                 new AlphaVantageDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
@@ -89,6 +90,7 @@ namespace Valuation.Console
                 services.AddTransient<ICurrencyRateService, CurrencyRateService>();
                 services.AddTransient<IValuationService, ValuationService>();
                 services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
+                
                 services.AddTransient<ValuationCalculator>();
                 services.AddTransient<ValuationSummaryCalculator>();
 

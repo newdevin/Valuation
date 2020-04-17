@@ -75,11 +75,11 @@ namespace Valuation.Service.Test
                 new EndOfDayPrice(listingId,listingVolume.Day,1,1,1,1,1000),
                 new EndOfDayPrice(listingId,listingVolume2.Day,1,2,1,1,1000)
             };
-            
+
             var currencyRates = new List<CurrencyRate> {
-            new CurrencyRate { Day = listingDate, From = "USD", To = "GBP" , Id =1, Rate = 0.50m},
-            new CurrencyRate { Day = listingDate.AddDays(1), From = "USD", To = "GBP" , Id =1, Rate = 0.50m},
-            new CurrencyRate { Day = listingDate.AddDays(2), From = "USD", To = "GBP" , Id =1, Rate = 1m}
+            new CurrencyRate(1,"USD","GBP", 0.5m, listingDate),// { Day = listingDate, From = "USD", To = "GBP" , Id =1, Rate = 0.50m},
+            new CurrencyRate(2, "USD", "GBP", 0.5m, listingDate.AddDays(1)),// { Day = listingDate.AddDays(1), From = "USD", To = "GBP" , Id =1, Rate = 0.50m},
+            new CurrencyRate(3,"USD","GBP", 1m, listingDate.AddDays(2))// { Day = listingDate.AddDays(2), From = "USD", To = "GBP" , Id =1, Rate = 1m}
             };
 
             var listingVolumes = new List<ListingVolume> { listingVolume, listingVolume2 };

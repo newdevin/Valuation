@@ -113,7 +113,7 @@ namespace Valuation.WorldTradingData.Service
                        var p = d.Split(',', StringSplitOptions.None);
                        DateTime.TryParse(p[0], out DateTime day);
                        decimal.TryParse(p[1], out decimal rate);
-                       return new CurrencyRate { From = symbol, Day = day, To = "GBP", Rate = rate };
+                       return new CurrencyRate(0, symbol, "GBP", rate, day);
                    });
         }
     }

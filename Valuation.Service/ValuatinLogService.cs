@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace Valuation.Service
 {
-    public class ValuatinLogService : IValuationLogService
+    public class ValuationLogService : IValuationLogService
     {
         private readonly IValuationLogRepository valuationLogRepository;
 
-        public ValuatinLogService(IValuationLogRepository  valuatinoLogRepository)
+        public ValuationLogService(IValuationLogRepository  valuatinoLogRepository)
         {
             this.valuationLogRepository = valuatinoLogRepository;
         }

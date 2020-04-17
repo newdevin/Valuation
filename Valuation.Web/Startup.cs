@@ -64,6 +64,7 @@ namespace Valuation.Web
             services.AddScoped<IValuationRepository, ValuationRepository>();
             services.AddScoped<IBuyTradeRepository, BuyTradeRepository>();
             services.AddScoped<ISellTradeRepository, SellTradeRepository>();
+            services.AddScoped<IValuationLogRepository, ValuationLogRepository>();
             services.AddScoped<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>(s =>
             {
                 return new EndOfDayPriceDownloadService(s.GetService<ILogger<EndOfDayPriceDownloadService>>(), s.GetService<ITradingDataService>(),
@@ -71,8 +72,12 @@ namespace Valuation.Web
             });
 
             services.AddHttpClient();
-            services.AddScoped<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>();
-            services.AddScoped<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>();
+            services.AddScoped<ICurrencyRatesDownloadService, CurrencyRatesDownloadService>(s =>
+            {
+                return new CurrencyRatesDownloadService(s.GetService<ITradingDataService>(), s.GetService<ICurrencyRateService>(),
+                    s.GetService<IHttpClientFactory>(), delay);
+            });
+                        
             services.AddScoped<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
             services.AddScoped<ITradingDataService, AlphaVantageDataService>(s =>
             new AlphaVantageDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
@@ -83,6 +88,7 @@ namespace Valuation.Web
             services.AddScoped<ICurrencyRateService, CurrencyRateService>();
             services.AddScoped<IValuationService, ValuationService>();
             services.AddScoped<IEndOfDayPriceService, EndOfDayPriceService>();
+            services.AddScoped<IValuationLogService, ValuationLogService>();
             services.AddScoped<ValuationCalculator>();
             services.AddScoped<ValuationSummaryCalculator>();
         }

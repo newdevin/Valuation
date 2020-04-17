@@ -9,16 +9,16 @@ namespace Valuation.WorldTradingData.Service
 {
     public class AlphaVantageDataService : ITradingDataService
     {
-        
+
         private readonly Uri baseUri;
         private readonly IApiRepository apiRepository;
         private List<string> tokens;
         private static int index;
         private static readonly object lockObject = new object();
 
-        public AlphaVantageDataService( Uri baseUri, IApiRepository apiRepository)
+        public AlphaVantageDataService(Uri baseUri, IApiRepository apiRepository)
         {
-        
+
             this.baseUri = baseUri;
             this.apiRepository = apiRepository;
             GetTokens();
@@ -114,7 +114,7 @@ namespace Valuation.WorldTradingData.Service
                         {
                             volume = vol;
                         }
-                        
+
                         return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
                     }).Where(eod => eod.ClosePrice.HasValue);
         }
@@ -128,7 +128,7 @@ namespace Valuation.WorldTradingData.Service
                        var p = d.Split(',', StringSplitOptions.None);
                        DateTime.TryParse(p[0], out DateTime day);
                        decimal.TryParse(p[4], out decimal rate);
-                       return new CurrencyRate { From = symbol, Day = day, To = "GBP", Rate = rate };
+                       return new CurrencyRate(0, symbol, "GBP", rate, day);
                    });
         }
     }

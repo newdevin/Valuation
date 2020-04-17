@@ -8,7 +8,6 @@ namespace Valuation.Domain
     public class ListingVolume
     {
         
-
         public ListingVolume(int id, Listing listing, int quantity, DateTime day)
         {
             Id = id;

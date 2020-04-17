@@ -20,6 +20,15 @@ namespace Valuation.Repository
             this.context = context;
         }
 
+        public async Task<IEnumerable<ListingValuation>> GetValuations(DateTime day)
+        {
+            return await  context.Valuations.Where(v => v.Day == day)
+                .Include(lv=> lv.Listing)
+                .Select(v=> new ListingValuation { Id = v.Id})
+                .ToListAsync();
+
+        }
+
         public async Task<IEnumerable<ValuationSummary>> GetValuationSummary()
         {
             return await context.ValuationSummaries.OrderByDescending(s => s.Day).ToListAsync();
