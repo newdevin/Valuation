@@ -1,6 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
 
 namespace Valuation.Domain
 {
@@ -19,6 +18,5 @@ namespace Valuation.Domain
         public int Id { get; }
         public string Name { get; }
         public string AdditionalInformation { get; }
-        //public List<Listing> Listings { get; set; }
     }
 }

@@ -14,8 +14,6 @@ namespace Valuation.Domain
             Symbol = symbol;
         }
 
-        public string Symbol { get;  }
-
-     //   public List<Listing> Listings { get; set; }
+        public string Symbol { get; }
     }
 }
