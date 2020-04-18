@@ -16,6 +16,17 @@ namespace Valuation.Service.Test
             var day1 = new DateTime(2020, 10, 10);
             var day2 = new DateTime(2020, 10, 11);
             var day3 = new DateTime(2020, 10, 12);
+            var company1 = new Company(1, "Abc", null);
+            var currency1 = new Currency("USD");
+            var exchange1 = new Exchange("NYSE");
+
+            var company2 = new Company(1, "Vec", null);
+            var currency2 = new Currency("GBP");
+            var exchange2 = new Exchange("LSE");
+
+            var listing1 = new Listing(1, company1, exchange1, currency1, "ABC", null);
+            var listing2 = new Listing(2, company2, exchange2, currency2, "VEC", "L");
+
             var buyTrades = new List<BuyTrade>
             {
                 new BuyTrade {Id =1, BoughtOn = day1,PricePerShare =1, ListingId =1 , PricePerShareCurrency = "GBP", Quantity = 1000, TotalPaidInGbp = 1001 },
@@ -29,11 +40,11 @@ namespace Valuation.Service.Test
 
             var valuations = new List<ListingValuation>
             {
-                new ListingValuation { Id =1, Currency = "GBP", Day = day1, ListingId = 1, Price =1 , Quantity = 1000, Rate =1, TotalValue = 1000, TotalValueInGbp = 1000   },
-                new ListingValuation { Id =2, Currency = "GBP", Day = day2, ListingId = 1, Price =1.1m , Quantity = 1000, Rate =1, TotalValue = 1100, TotalValueInGbp = 1100   },
-                new ListingValuation { Id =4, Currency = "USD", Day = day1, ListingId = 2, Price =1m , Quantity = 100, Rate = 0.5m, TotalValue = 100, TotalValueInGbp = 50   },
-                new ListingValuation { Id =5, Currency = "USD", Day = day2, ListingId = 2, Price =2m , Quantity = 100, Rate = 0.5m, TotalValue = 200, TotalValueInGbp = 100   },
-                new ListingValuation { Id =6, Currency = "USD", Day = day3 , ListingId = 2, Price =2.1m , Quantity = 100, Rate = 0.5m, TotalValue = 210, TotalValueInGbp = 105 }
+                new ListingValuation { Id =1, Currency = "GBP", Day = day1, Listing = listing1, Price =1 , Quantity = 1000, Rate =1, TotalValue = 1000, TotalValueInGbp = 1000   },
+                new ListingValuation { Id =2, Currency = "GBP", Day = day2, Listing = listing1, Price =1.1m , Quantity = 1000, Rate =1, TotalValue = 1100, TotalValueInGbp = 1100   },
+                new ListingValuation { Id =4, Currency = "USD", Day = day1, Listing = listing2, Price =1m , Quantity = 100, Rate = 0.5m, TotalValue = 100, TotalValueInGbp = 50   },
+                new ListingValuation { Id =5, Currency = "USD", Day = day2, Listing = listing2, Price =2m , Quantity = 100, Rate = 0.5m, TotalValue = 200, TotalValueInGbp = 100   },
+                new ListingValuation { Id =6, Currency = "USD", Day = day3 ,Listing = listing2, Price =2.1m , Quantity = 100, Rate = 0.5m, TotalValue = 210, TotalValueInGbp = 105 }
             };
 
             var actual = summaryCalculator.GetSummary(buyTrades, sellTrades, valuations);

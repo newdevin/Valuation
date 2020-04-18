@@ -18,6 +18,6 @@ namespace Valuation.Repository.Entities
         public decimal Rate { get; set; }
         public decimal TotalValue { get; set; }
         public decimal TotalValueInGbp { get; set; }
-        
+        public ListingEntity Listing { get; set; }
     }
 }

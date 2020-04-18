@@ -1,0 +1,8 @@
+<div>
+  <div class="d-flex flex-row-reverse">
+    <label class="radio-inline" style="margin: 20px;" *ngFor="let interval of intervals;">
+      <input type="radio" name="interval" [value]="interval" [checked]="interval==='1M'"  (change)="onSelectionChange(interval)">{{interval}}
+    </label>
+  </div>
+  <p-chart type="line" [data]="data" [options]="options"></p-chart>
+</div>

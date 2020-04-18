@@ -58,9 +58,9 @@ namespace WorldTradingData.Service.Test
         public void ShouldReturnCorrectUriWhenDateIsSpecified()
         {
             string symbol = "ABC";
-            var dateString = DateTime.Now.AddDays(-10).ToString("yyyy-MM-dd");
+            var day = DateTime.Now.AddDays(-10);
             string size = "compact";
-            var uri = AlphaVantageDataService.GetEndOfDayPriceUri(null, symbol, null);
+            var uri = AlphaVantageDataService.GetEndOfDayPriceUri(day, symbol, null);
 
             var query = uri.Query.Replace("?", "");
             Assert.NotNull(query);
