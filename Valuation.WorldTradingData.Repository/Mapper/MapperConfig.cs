@@ -2,22 +2,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Valuation.Domain;
 using Valuation.Repository.Entities;
 
-namespace Valuation.Console
+namespace Valuation.Repository.Mapper
 {
     public class MapperConfig : Profile
     {
         public MapperConfig()
         {
-            //MapCurrency();
+            MapCurrency();
             MapExchange();
             MapCompany();
             MapListing();
             MapEndOfDayPrice();
             MapListingVolume();
+            MapValuation();
+        }
+
+        private void MapValuation()
+        {
+            CreateMap<ListingValuationEntity, ListingValuation>()
+                .ForMember(dest => dest.Currency, opt=> opt.MapFrom(src=> src.ShareCurrency))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.SharePrice))
+                .ReverseMap();
         }
 
         private void MapListingVolume()
@@ -61,11 +69,11 @@ namespace Valuation.Console
                             .ReverseMap();
         }
 
-        //private void MapCurrency()
-        //{
-        //    CreateMap<CurrencyEntity, Currency>()
-        //                    .ConstructUsing(entity => new Currency(entity.Symbol))
-        //                    .ReverseMap();
-        //}
+        private void MapCurrency()
+        {
+            CreateMap<CurrencyEntity, Currency>()
+                            .ConstructUsing(entity => new Currency(entity.Symbol))
+                            .ReverseMap();
+        }
     }
 }

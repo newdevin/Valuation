@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Valuation.Domain;
 using Valuation.Service;
-using Valuation.Infrastructure;
+using Valuation.Repository.Mapper;
 
 namespace Valuation.Repository
 {
@@ -15,10 +15,10 @@ namespace Valuation.Repository
         private readonly PicassoDbContext context;
         private readonly IObjectMapper mapper;
 
-        public CurrencyRateRepository(PicassoDbContext context,IObjectMapper objectMapper)
+        public CurrencyRateRepository(PicassoDbContext context,IObjectMapper mapper)
         {
             this.context = context;
-            this.mapper = objectMapper;
+            this.mapper = mapper;
         }
 
         public async Task<IEnumerable<CurrencyRate>> GetCurencyRatesSince( DateTime sinceDay)
@@ -28,7 +28,8 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<(Currency, DateTime?)>> GetCurrenciesWithLastDownloadedDate()
         {
-            var currencies = await context.Currencies.Where(c=> c.Symbol != "GBP").ToListAsync();
+            var currenciesEntities = await context.Currencies.Where(c=> c.Symbol != "GBP").ToListAsync();
+            var currencies = mapper.MapTo<Currency>(currenciesEntities);
             var currencyRates = await context.CurrencyRates.GroupBy(cr => cr.From)
                 .Select(x => new { From = x.Key, Day = (DateTime?)x.Max(p => p.Day) })
                 .ToListAsync();

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Valuation.Infrastructure
+namespace Valuation.Repository.Mapper
 {
     public class ObjectMapper : IObjectMapper
     {
@@ -13,14 +13,14 @@ namespace Valuation.Infrastructure
         {
             this.mapper = mapper;
         }
-        public T MapTo<U, T>(U u)
+        public T MapTo<T>(object obj)
         {
-            return mapper.Map<T>(u);
+            return mapper.Map<T>(obj);
         }
 
-        //public IEnumerable<T> MapTo<U, T>(IEnumerable<U> u)
-        //{
-        //    return u.Select(x => MapTo(x));
-        //}
+        public IEnumerable<T> MapTo<T>(IEnumerable<object> u)
+        {
+            return mapper.Map<IEnumerable<T>>(u);
+        }
     }
 }

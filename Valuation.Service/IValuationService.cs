@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Valuation.Domain;
 
 namespace Valuation.Service
 {
@@ -9,6 +10,8 @@ namespace Valuation.Service
     {
         Task ValuePortfolio(DateTime upToDateTime);
         Task<IEnumerable<ValuationSummary>> GetValuationSummary();
+        Task<IEnumerable<ListingValuation>> GetValuations(DateTime date);
+
     }
 
 }

@@ -10,13 +10,12 @@ using AutoMapper;
 using Valuation.Service.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Valuation.Infrastructure;
-using IObjectMapper = Valuation.Infrastructure.IObjectMapper;
 using Serilog;
 using Serilog.Events;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
+using Valuation.Repository.Mapper;
 
 namespace Valuation.Console
 {
@@ -49,7 +48,7 @@ namespace Valuation.Console
             {
                 services.AddHostedService<Worker>();
 
-                services.AddAutoMapper(typeof(Worker));
+                services.AddAutoMapper(typeof(ObjectMapper));
 
                 var conStr = hostContext.Configuration.GetConnectionString("PicassoDbConnectionString");
                 var uriString = hostContext.Configuration["AlphaVantage"];
@@ -79,7 +78,7 @@ namespace Valuation.Console
                     return new CurrencyRatesDownloadService(s.GetService<ITradingDataService>(), s.GetService<ICurrencyRateService>(),
                         s.GetService<IHttpClientFactory>(), delay);
                 });
-                services.AddTransient<IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
+                services.AddTransient<Repository.Mapper.IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
                 services.AddTransient<ITradingDataService, AlphaVantageDataService>(s =>
                 new AlphaVantageDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
                 services.AddTransient<IListingService, ListingService>();

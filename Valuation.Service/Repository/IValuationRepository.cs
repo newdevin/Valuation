@@ -10,5 +10,6 @@ namespace Valuation.Service.Repository
     {
         Task Save(IEnumerable<ListingValuation> valuations, IEnumerable<ValuationSummary> summary);
         Task<IEnumerable<ValuationSummary>> GetValuationSummary();
+        Task<IEnumerable<ListingValuation>> GetValuations(DateTime day);
     }
 }

@@ -6,9 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Valuation.Domain;
-using Valuation.Infrastructure;
+using Valuation.Repository.Mapper;
 using Valuation.Service.Repository;
-using Valuation.Repository.Entities;
 
 namespace Valuation.Repository
 {
@@ -44,7 +43,7 @@ namespace Valuation.Repository
 
             var listingsWithDate = p
                 .Where(x => x.ListingVolume.Quantity > 0)
-                .Select(x => Tuple.Create(mapper.MapTo<ListingEntity, Listing>(x.ListingVolume.Listing), x.eodPrice?.FirstOrDefault()?.Day))
+                .Select(x => Tuple.Create(mapper.MapTo<Listing>(x.ListingVolume.Listing), x.eodPrice?.FirstOrDefault()?.Day))
                 .ToList();
 
             return listingsWithDate;
@@ -52,8 +51,8 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<ListingVolume>> GetListingVolumes()
         {
-            var entities = await context.ListingVolumes.Include(lv=>lv.Listing.Currency).ToListAsync();
-            return entities.Select(e => mapper.MapTo<ListingVolumeEntity, ListingVolume>(e));
+            var entities = await context.ListingVolumes.Include(lv => lv.Listing.Currency).ToListAsync();
+            return entities.Select(e => mapper.MapTo<ListingVolume>(e));
         }
     }
 }

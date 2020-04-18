@@ -13,9 +13,9 @@ namespace Valuation.Repository.Entities
         public string ExchangeSymbol { get; set; }
         [Column("Currency")]
         public string CurrencySymbol { get; set; }
-        public CompanyEntity Company { get; set; }
-        public ExchangeEntity Exchange { get; set; }
-        public Currency Currency { get; set; }
+        public CompanyEntity Company{ get; set; }
+        public ExchangeEntity Exchange{ get; set; }
+        public CurrencyEntity Currency{ get; set; }
     }
 
 }

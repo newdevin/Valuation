@@ -21,6 +21,15 @@ namespace Valuation.Web.Controllers
             this.valuationService = valuationService;
         }
 
+
+        [HttpGet]
+        [Route("{day}")]
+        public async Task<IActionResult> GetValuations(DateTime day)
+        {
+            var vals = await valuationService.GetValuations(day);
+            return Ok(vals);
+        }
+
         [HttpGet]
         [Route("summary/{interval}")]
         public async Task<ActionResult> GetValuationSummary(string interval)

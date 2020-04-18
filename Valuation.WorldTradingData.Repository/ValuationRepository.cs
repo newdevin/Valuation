@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Valuation.Domain;
 using Valuation.Repository.Entities;
+using Valuation.Repository.Mapper;
 using Valuation.Service;
 using Valuation.Service.Repository;
 
@@ -14,10 +15,20 @@ namespace Valuation.Repository
     public class ValuationRepository : IValuationRepository
     {
         private readonly PicassoDbContext context;
+        private readonly IObjectMapper mapper;
 
-        public ValuationRepository(PicassoDbContext context)
+        public ValuationRepository(PicassoDbContext context, IObjectMapper mapper)
         {
             this.context = context;
+            this.mapper = mapper;
+        }
+
+        public async Task<IEnumerable<ListingValuation>> GetValuations(DateTime day)
+        {
+            var entities = await context.Valuations.Where(v => v.Day == day)
+                .ToListAsync();
+
+            return mapper.MapTo<ListingValuation>(entities);
         }
 
         public async Task<IEnumerable<ValuationSummary>> GetValuationSummary()
@@ -29,8 +40,9 @@ namespace Valuation.Repository
         {
             await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Valuation");
             await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE ValuationSummary");
-            
-            context.Valuations.AddRange(valuations);
+
+            var entities = mapper.MapTo<ListingValuationEntity>(valuations);
+            context.Valuations.AddRange(entities);
             context.ValuationSummaries.AddRange(summary);
             await context.SaveChangesAsync();
         }
