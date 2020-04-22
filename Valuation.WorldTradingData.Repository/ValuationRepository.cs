@@ -40,6 +40,7 @@ namespace Valuation.Repository
         {
             await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Valuation");
             await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE ValuationSummary");
+            await context.SaveChangesAsync();
 
             var entities = mapper.MapTo<ListingValuationEntity>(valuations);
             context.Valuations.AddRange(entities);
