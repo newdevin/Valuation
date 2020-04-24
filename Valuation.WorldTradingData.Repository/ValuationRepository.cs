@@ -25,7 +25,7 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<ListingValuation>> GetValuations(DateTime day)
         {
-            var entities = await context.Valuations.Where(v => v.Day == day)
+            var entities = await context.Valuations.AsNoTracking().Where(v => v.Day == day)
                 .ToListAsync();
 
             return mapper.MapTo<ListingValuation>(entities);
@@ -33,7 +33,7 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<ValuationSummary>> GetValuationSummary()
         {
-            return await context.ValuationSummaries.OrderByDescending(s => s.Day).ToListAsync();
+            return await context.ValuationSummaries.AsNoTracking().OrderByDescending(s => s.Day).ToListAsync();
         }
 
         public async Task Save(IEnumerable<ListingValuation> valuations, IEnumerable<ValuationSummary> summary)

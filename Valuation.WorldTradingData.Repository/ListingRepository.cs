@@ -28,11 +28,13 @@ namespace Valuation.Repository
                 .Include(lv => lv.Listing.Currency);
 
             var activeListingVolumeEntities = await context.ListingVolumes
+                                    .AsNoTracking()
                                     .Where(lv => lv.Day == allListingEntities.Where(al => al.Listing.Id == lv.Listing.Id).Max(al => al.Day))
                                     .Include(lv => lv.Listing.Currency)
                                     .Select(lv => lv).ToListAsync();
 
             var eodPrices = await context.EndOfDayPrices
+                                    .AsNoTracking()
                                     .Where(eodPrice => eodPrice.Day == context.EndOfDayPrices.Where(al => al.Listing.Id == eodPrice.Listing.Id).Max(al => al.Day))
                                     .Include(eod => eod.Listing.Currency)
                                     .ToListAsync();
@@ -51,7 +53,7 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<ListingVolume>> GetListingVolumes()
         {
-            var entities = await context.ListingVolumes.Include(lv => lv.Listing.Currency).ToListAsync();
+            var entities = await context.ListingVolumes.Include(lv => lv.Listing.Currency).AsNoTracking().ToListAsync();
             return entities.Select(e => mapper.MapTo<ListingVolume>(e));
         }
     }
