@@ -57,7 +57,7 @@ namespace Valuation.Console
                     {
                         logger.LogInformation("Starting daily valuation");
                         var id = await valuationLogService.ValuationServiceStarted();
-                        await valuationService.ValuePortfolio(DateTime.Now.AddDays(-1));
+                        await valuationService.ValuePortfolio();
                         await valuationLogService.ValuationServiceCompleted(id);
                         valuationRunDateTime = DateTime.Now.Date;
                         logger.LogInformation("Finished daily valuation");

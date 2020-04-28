@@ -47,5 +47,10 @@ namespace Valuation.Repository
             context.ValuationSummaries.AddRange(summary);
             await context.SaveChangesAsync();
         }
+
+        public async Task ValuePortfolio()
+        {
+            await context.Database.ExecuteSqlRawAsync("EXEC dbo.FullValuation");
+        }
     }
 }

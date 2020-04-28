@@ -66,6 +66,11 @@ namespace Valuation.Service
 
             await valuationRepository.Save(valuations, summary);
         }
+
+        public Task ValuePortfolio()
+        {
+            return valuationRepository.ValuePortfolio();
+        }
     }
 
 }
