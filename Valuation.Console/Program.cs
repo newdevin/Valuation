@@ -67,6 +67,8 @@ namespace Valuation.Console
                 services.AddTransient<IBuyTradeRepository, BuyTradeRepository>();
                 services.AddTransient<ISellTradeRepository, SellTradeRepository>();
                 services.AddTransient<IValuationLogService, ValuatinLogService>();
+                services.AddTransient<IProviderRepository, ProviderRepository>();
+                services.AddTransient<ITargetSellPriceRepostiory, TargetSellPriceRepostiory>();
                 services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>(s =>
                 {
                     return new EndOfDayPriceDownloadService(s.GetService<ILogger<EndOfDayPriceDownloadService>>(), s.GetService<ITradingDataService>(),
@@ -88,6 +90,21 @@ namespace Valuation.Console
                 services.AddTransient<ICurrencyRateService, CurrencyRateService>();
                 services.AddTransient<IValuationService, ValuationService>();
                 services.AddTransient<IEndOfDayPriceService, EndOfDayPriceService>();
+                services.AddTransient<INotificationService, EmailNotificationService>(s =>
+                {
+                    var smtpServer = hostContext.Configuration["Notification:smtpServerName"];
+                    var serviceName = hostContext.Configuration["Notification:serviceName"];
+                    var fromAddress = hostContext.Configuration["Notification:fromAddress"];
+                    var fromName = hostContext.Configuration["Notification:fromName"];
+                    var toAddress = hostContext.Configuration["Notification:toAddress"];
+                    int.TryParse(hostContext.Configuration["Notification:port"], out int port);
+                    return new EmailNotificationService(s.GetService<ILogger<EmailNotificationService>>(), s.GetService<IProviderService>(),
+                        serviceName, fromAddress, fromName, toAddress, smtpServer, port);
+                });
+                services.AddTransient<IPriceAlertService, PriceAlertSerice>();
+                services.AddTransient<ITargetSellPriceReachedService, TargetSellPriceReachedService>();
+                services.AddTransient<IProviderService, ProviderService>();
+
                 services.AddTransient<ValuationCalculator>();
                 services.AddTransient<ValuationSummaryCalculator>();
 

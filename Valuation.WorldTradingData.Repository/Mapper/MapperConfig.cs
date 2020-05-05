@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Valuation.Domain;
 using Valuation.Repository.Entities;
+using Valuation.Service;
 
 namespace Valuation.Repository.Mapper
 {
@@ -18,6 +19,23 @@ namespace Valuation.Repository.Mapper
             MapEndOfDayPrice();
             MapListingVolume();
             MapValuation();
+            MapTargetSellPrices();
+            MapProvider();
+        }
+
+        private void MapProvider()
+        {
+            CreateMap<ProviderEntity, Provider>()
+                .ConstructUsing(e => new Provider(e.ServiceName, e.ServiceAgent, e.Key))
+                .ReverseMap();
+        }
+
+        private void MapTargetSellPrices()
+        {
+            CreateMap<TargetSellPriceEntity, TargetSellPrice>()
+                .ConstructUsing((entity, ctx) => new TargetSellPrice(ctx.Mapper.Map<Listing>(entity.Listing), entity.TargetPrice));
+                
+
         }
 
         private void MapValuation()

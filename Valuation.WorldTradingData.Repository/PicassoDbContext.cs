@@ -25,9 +25,7 @@ namespace Valuation.Repository
                 e.ToTable("ValuationSummary");
             });
 
-          
-
-            base.OnModelCreating(modelBuilder);
+           base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<CompanyEntity> Companies { get; set; }
@@ -44,8 +42,9 @@ namespace Valuation.Repository
         public DbSet<ValuationSummary> ValuationSummaries { get; set; }
         public DbSet<BuyTrade> BuyTrades { get; set; }
         public DbSet<SellTrade> SellTrades { get; set; }
-
         public DbSet<ValuationLogEntity> ValuationLogs { get; set; }
+        public DbSet<TargetSellPriceEntity> TargetSellPrices { get; set; }
+        public DbSet<ProviderEntity> Providers { get; set; }
 
     }
 }
