@@ -11,5 +11,7 @@ namespace Valuation.Service
     {
         Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastEodPriceDateTime();
         Task<IEnumerable<ListingVolume>> GetListingVolumes();
+
+        Task<IEnumerable<ListingVolume>> GetActiveListingVolumes();
     }
 }

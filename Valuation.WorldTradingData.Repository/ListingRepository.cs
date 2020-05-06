@@ -21,23 +21,39 @@ namespace Valuation.Repository
             this.context = context;
             this.mapper = mapper;
         }
-        public async Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastPriceFetchDay()
-        {
 
+        public async Task<IEnumerable<ListingVolume>> GetActiveListingVolumes()
+        {
             var allListingEntities = await context.ListingVolumes
                 .Include(lv => lv.Listing.Currency).ToListAsync();
-                        
+
             var activeListingVolumeEntities = allListingEntities
                                     .GroupBy(lv => lv.ListingId, lv => lv)
                                     .Select(x => x.OrderByDescending(p => p.Day).FirstOrDefault())
                                     .Where(x => x.Quantity > 0)
                                     .ToList();
+            return activeListingVolumeEntities.Select(mapper.MapTo<ListingVolume>).ToList();
+        }
+
+        public async Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastPriceFetchDay()
+        {
+
+            //var allListingEntities = await context.ListingVolumes
+            //    .Include(lv => lv.Listing.Currency).ToListAsync();
+                        
+            //var activeListingVolumeEntities = allListingEntities
+            //                        .GroupBy(lv => lv.ListingId, lv => lv)
+            //                        .Select(x => x.OrderByDescending(p => p.Day).FirstOrDefault())
+            //                        .Where(x => x.Quantity > 0)
+            //                        .ToList();
 
             var eodPrices = await context.EndOfDayPrices
                                     .AsNoTracking()
                                     .Where(eodPrice => eodPrice.Day == context.EndOfDayPrices.Where(al => al.Listing.Id == eodPrice.Listing.Id).Max(al => al.Day))
                                     .Include(eod => eod.Listing.Currency)
                                     .ToListAsync();
+
+            var activeListingVolumeEntities = await GetActiveListingVolumes();
 
             var p = activeListingVolumeEntities.GroupJoin(eodPrices, lv => lv.Listing.Id, eod => eod.Listing.Id, (lv, eod) => new { ListingVolume = lv, EndOfDayPrice = eod })
                 .SelectMany(x => x.EndOfDayPrice.DefaultIfEmpty(), (x, y) => new { ListingVolume = x.ListingVolume, eodPrice = x.EndOfDayPrice })

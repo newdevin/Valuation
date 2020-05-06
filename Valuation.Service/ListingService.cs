@@ -14,6 +14,12 @@ namespace Valuation.Service
         {
             this.listingRepository = listingRepository;
         }
+
+        public Task<IEnumerable<ListingVolume>> GetActiveListingVolumes()
+        {
+            return listingRepository.GetActiveListingVolumes();
+        }
+
         public Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastEodPriceDateTime()
         {
             return listingRepository.GetActiveListingWithLastPriceFetchDay();
