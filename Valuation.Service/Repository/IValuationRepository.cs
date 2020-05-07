@@ -12,5 +12,6 @@ namespace Valuation.Service.Repository
         Task<IEnumerable<ValuationSummary>> GetValuationSummary();
         Task<IEnumerable<ListingValuation>> GetValuations(DateTime day);
         Task ValuePortfolio();
+        Task<PortfolioValuation> GetPortfolioValuation(DateTime day);
     }
 }

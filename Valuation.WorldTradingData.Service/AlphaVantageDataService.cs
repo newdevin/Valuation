@@ -149,6 +149,8 @@ namespace Valuation.WorldTradingData.Service
             //symbol	open	high	low	price	volume	latestDay	previousClose	change	changePercent
             var d = data.Split(",", StringSplitOptions.None);
             decimal.TryParse(d[4], out decimal price);
+            if (listing.Currency.Symbol == "GBP")
+                price /= 100;
             DateTime.TryParse(d[6], out DateTime day);
             return new Quote(listing, price, day);
         }

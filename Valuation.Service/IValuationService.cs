@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using Valuation.Domain;
@@ -13,6 +14,7 @@ namespace Valuation.Service
         Task<IEnumerable<ValuationSummary>> GetValuationSummary();
         Task<IEnumerable<ListingValuation>> GetValuations(DateTime date);
 
+        Task<PortfolioValuation> GetPortfolioValuation(DateTime day);
     }
 
 }

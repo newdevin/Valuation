@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,25 @@ namespace Valuation.Repository
         {
             this.context = context;
             this.mapper = mapper;
+        }
+
+        public async Task<PortfolioValuation> GetPortfolioValuation(DateTime onDay)
+        {
+            var day = onDay.Date;
+            var summaries = await context.ValuationSummaries.Where(vs => vs.Day == day.Date || vs.Day == day.AddDays(-1).Date).ToListAsync();
+            var summary1 = summaries.FirstOrDefault(e => e.Day == day);
+            var summary2 = summaries.FirstOrDefault(e => e.Day == day.AddDays(-1).Date);
+
+            return new PortfolioValuation
+            {
+                ValuationSummary = summary1,
+                TotalCostChange = summary1.TotalCostInGbp - summary2.TotalCostInGbp,
+                TotalProfitChange = summary1.TotalProfitInGbp - summary2.TotalProfitInGbp,
+                TotalRealisedChange = summary1.TotalRealisedInGbp - summary2.TotalRealisedInGbp,
+                TotalSellChanged = summary1.TotalSellInGbp - summary2.TotalSellInGbp,
+                TotalValuationChange = summary1.ValuationInGbp - summary2.ValuationInGbp,
+            };
+
         }
 
         public async Task<IEnumerable<ListingValuation>> GetValuations(DateTime day)

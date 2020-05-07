@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Valuation.Service;
@@ -20,6 +18,7 @@ namespace Valuation.Console
         private readonly IValuationLogService valuationLogService;
         private readonly IPriceAlertService priceAlertService;
         private readonly IConfiguration configuration;
+        private readonly INotificationService notificationService;
         private readonly ILogger<Worker> logger;
         private bool monitorPrices = false;
         private bool monitorPricesIsStopped = false;
@@ -38,7 +37,8 @@ namespace Valuation.Console
             IValuationService valuationService,
             IValuationLogService valuationLogService,
             IPriceAlertService priceAlertService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            INotificationService notificationService)
         {
             this.logger = logger;
             this.endOfDayPriceService = endOfDayPriceService;
@@ -49,7 +49,7 @@ namespace Valuation.Console
             this.valuationLogService = valuationLogService;
             this.priceAlertService = priceAlertService;
             this.configuration = configuration;
-
+            this.notificationService = notificationService;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -62,7 +62,10 @@ namespace Valuation.Console
                 {
                     await DoWork(cancellationToken);
                     if (AllDownloadSucceeded() && !await ValuationRunToday())
+                    {
                         await RunValuation();
+                        await SendValuationNotification();
+                    }
                 }
                 catch (Exception e)
                 {
@@ -70,6 +73,21 @@ namespace Valuation.Console
                 }
                 await Task.Delay(TimeSpan.FromMinutes(1));
             }
+        }
+
+        private async Task SendValuationNotification()
+        {
+            var day = DateTime.Now.AddDays(-1);
+            var portfolioValuation = await valuationService.GetPortfolioValuation(day);
+            var subject = $"Portfolio Valuation for {day:dd MMM yyyy}";
+            string message = ConsturctMessage(portfolioValuation);
+            await notificationService.Send(subject, message);
+            logger.LogInformation($"Portfolio valuation notification sent");
+        }
+
+        private static string ConsturctMessage(PortfolioValuation val)
+        {
+            return $"Total Value of portfolio : {(int)val.ValuationSummary.ValuationInGbp:n0} GBP. Total changed since day before : {(int)val.TotalValuationChange:n0} GBP.";
         }
 
         private void MonitorPrices(CancellationToken token)
