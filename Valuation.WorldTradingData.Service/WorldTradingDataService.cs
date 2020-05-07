@@ -116,5 +116,15 @@ namespace Valuation.WorldTradingData.Service
                        return new CurrencyRate { From = symbol, Day = day, To = "GBP", Rate = rate };
                    });
         }
+
+        public Uri GetQuoteUri(string symbol, string suffix)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Quote GetQuote(string data, Listing listing)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

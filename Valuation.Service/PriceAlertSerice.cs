@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Valuation.Domain;
 
 namespace Valuation.Service
 {
@@ -13,47 +14,76 @@ namespace Valuation.Service
         private readonly ITargetSellPriceReachedService targetSellPriceReachedService;
         private readonly IEndOfDayPriceService endOfDayPriceService;
         private readonly INotificationService notificationService;
+        private readonly IQuoteService quoteService;
 
-        public PriceAlertSerice(ILogger<PriceAlertSerice> logger, 
-            ITargetSellPriceReachedService targetSellPriceReachedService, 
+        public PriceAlertSerice(ILogger<PriceAlertSerice> logger,
+            ITargetSellPriceReachedService targetSellPriceReachedService,
             IEndOfDayPriceService endOfDayPriceService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IQuoteService quoteService)
         {
             this.logger = logger;
             this.targetSellPriceReachedService = targetSellPriceReachedService;
             this.endOfDayPriceService = endOfDayPriceService;
             this.notificationService = notificationService;
+            this.quoteService = quoteService;
         }
         public async Task CheckAndSendAlert()
         {
             var targetSellPrices = await targetSellPriceReachedService.GetTargetSellPrices();
-            var listingIds = targetSellPrices.Select(tp => tp.Listing.Id).ToList();
-            var currentPrices = await endOfDayPriceService.GetLatestEndOfDayPrices(listingIds);
+            var listings = targetSellPrices.Select(tp => tp.Listing).ToList();
 
-            var targetReachedPrices =  targetSellPrices.Where(tp =>
-            {
-                var eodPrice = currentPrices.FirstOrDefault(p => tp.Listing.Id == p.ListingId);
-                return eodPrice != null && tp.IsTargetSellPriceReached(eodPrice.ClosePrice.Value);
-            })
-            .ToList();
+            await CheckEodPrices(targetSellPrices, listings);
+            await CheckQuotes(targetSellPrices, listings);
+
+        }
+
+        private async Task CheckQuotes(IEnumerable<TargetSellPrice> targetSellPrices, List<Listing> listings)
+        {
+            var quotes = await quoteService.GetQuotes(listings);
+
+            var targetReachedPrices = targetSellPrices
+                .Select(tp => (tp, quotes.FirstOrDefault(p => tp.Listing.Id == p.Listing.Id)))
+                .Where(it => it.Item2 != null && it.Item2.Price.HasValue && it.tp.IsTargetSellPriceReached(it.Item2.Price.Value))
+                .Select(it => (it.tp, it.Item2.Price.Value))
+                .ToList();
 
             if (targetReachedPrices.Any())
             {
                 await SendNotification(targetReachedPrices);
-                await targetSellPriceReachedService.SetNotified(targetReachedPrices.Select(t => t.Listing.Id).Distinct());
+                await targetSellPriceReachedService.SetNotified(targetReachedPrices.Select(t => t.tp.Listing.Id).Distinct());
             }
             else
-                logger.LogInformation("No target prices set or non reached the target price");
-            
+                logger.LogInformation($"No target prices set or non reached the target price based on quoted price on {DateTime.Now:dd MMM yyyy HH:mm}");
+
         }
 
-        private async Task SendNotification(IEnumerable<TargetSellPrice> targetReachedPrices)
+        private async Task CheckEodPrices(IEnumerable<TargetSellPrice> targetSellPrices, List<Listing> listings)
+        {
+            var listingIds = listings.Select(l => l.Id).ToList();
+            var eodPrices = await endOfDayPriceService.GetLatestEndOfDayPrices(listingIds);
+            var targetReachedPrices = targetSellPrices
+                .Select(tp => (tp, eodPrices.FirstOrDefault(p => tp.Listing.Id == p.ListingId)))
+                .Where(it => it.Item2 != null && it.tp.IsTargetSellPriceReached(it.Item2.ClosePrice.Value))
+                .Select(it => (it.tp, it.Item2.ClosePrice.Value))
+                .ToList();
+
+            if (targetReachedPrices.Any())
+            {
+                await SendNotification(targetReachedPrices);
+                await targetSellPriceReachedService.SetNotified(targetReachedPrices.Select(t => t.tp.Listing.Id).Distinct());
+            }
+            else
+                logger.LogInformation("No target prices set or non reached the target price based on End of day price");
+        }
+
+        private async Task SendNotification(IEnumerable<(TargetSellPrice, decimal)> targetReachedPrices)
         {
             StringBuilder message = new StringBuilder();
             var subject = "Sell target price reached";
-            foreach(var target in targetReachedPrices)
+            foreach (var target in targetReachedPrices)
             {
-                message.AppendLine($"{target.Listing.Symbol} has exceeded the target sell price of {target.TargetPrice}");
+                message.AppendLine($"{target.Item1.Listing.Symbol} has exceeded the target sell price of {target.Item1.TargetPrice}. New price is {target.Item2}");
             }
             await notificationService.Send(subject, message.ToString());
         }

@@ -21,12 +21,14 @@ namespace Valuation.Console
         private readonly IPriceAlertService priceAlertService;
         private readonly IConfiguration configuration;
         private readonly ILogger<Worker> logger;
+        private bool monitorPrices = false;
+        private bool monitorPricesIsStopped = false;
 
         private DateTime? endOfDayPriceDownloadedDateTime;
         private DateTime? currencyRatesDownloadedDateTime;
         private DateTime? valuationRunDateTime;
 
-        
+
 
         public Worker(ILogger<Worker> logger,
             IEndOfDayPriceDownloadService endOfDayPriceService,
@@ -52,26 +54,51 @@ namespace Valuation.Console
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            try
+            monitorPrices = true;
+            MonitorPrices(cancellationToken);
+            while (!cancellationToken.IsCancellationRequested)
             {
-
-                while (!cancellationToken.IsCancellationRequested)
+                try
                 {
                     await DoWork(cancellationToken);
                     if (AllDownloadSucceeded() && !await ValuationRunToday())
-                    {
                         await RunValuation();
-                        await priceAlertService.CheckAndSendAlert();
-                    }
-
-                    await Task.Delay(TimeSpan.FromMinutes(1));
                 }
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e.ToString());
+                catch (Exception e)
+                {
+                    logger.LogError(e.ToString());
+                }
                 await Task.Delay(TimeSpan.FromMinutes(1));
             }
+        }
+
+        private void MonitorPrices(CancellationToken token)
+        {
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+                    if (monitorPrices == false)
+                    {
+                        monitorPricesIsStopped = true;
+                        logger.LogInformation("Monitor prices is now PAUSED");
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        continue;
+                    }
+                    monitorPricesIsStopped = false;
+                    logger.LogInformation("Monitor prices is now ACTIVE");
+                    await priceAlertService.CheckAndSendAlert();
+                    monitorPricesIsStopped = true;
+                    for (int i = 0; i < 15; i++)
+                    {
+                        if (monitorPrices == false)
+                            break;
+                        await Task.Delay(TimeSpan.FromMinutes(1));
+                    }
+                }
+            });
         }
 
         private async Task RunValuation()
@@ -99,13 +126,6 @@ namespace Valuation.Console
             }
         }
 
-        public TimeSpan GetNextRunTime()
-        {
-            var now = DateTime.Now.Date;
-            var timeSpan = now.AddDays(1).AddHours(8) - now;
-            return timeSpan;
-        }
-
         private bool AllDownloadSucceeded()
         {
             var today = DateTime.Now.Date;
@@ -126,11 +146,28 @@ namespace Valuation.Console
             if (today.TimeOfDay >= startTime)
             {
                 if (!await CurrencyRatesDownloadedToday())
+                {
+                    monitorPrices = false;
+                    while (!monitorPricesIsStopped)
+                    {
+                        logger.LogInformation("Waiting for price monitoring to pause");
+                        await Task.Delay(TimeSpan.FromSeconds(15));
+                    }
                     await DownloadCurrencyRates(today);
+                }
 
                 if (!await EndOfDayPricesDownloadedToday())
+                {
+                    monitorPrices = false;
+                    while (!monitorPricesIsStopped)
+                    {
+                        logger.LogInformation("Waiting for price monitoring to pause");
+                        await Task.Delay(TimeSpan.FromSeconds(15));
+                    }
                     await DownloadEndOfPrices(today);
+                }
 
+                monitorPrices = true;
 
             }
             await Task.CompletedTask;

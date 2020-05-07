@@ -15,6 +15,7 @@ namespace Valuation.Service
 
         public bool IsTargetSellPriceReached(decimal price)
         {
+
             return price >= TargetPrice;
         }
 

@@ -104,7 +104,11 @@ namespace Valuation.Console
                 services.AddTransient<IPriceAlertService, PriceAlertSerice>();
                 services.AddTransient<ITargetSellPriceReachedService, TargetSellPriceReachedService>();
                 services.AddTransient<IProviderService, ProviderService>();
-
+                services.AddTransient<IQuoteService, AlphaVantageQuoteService>(s=>
+                {
+                    return new AlphaVantageQuoteService(s.GetService<ILogger<AlphaVantageQuoteService>>(), s.GetService<ITradingDataService>(),
+                        s.GetService<IHttpClientFactory>(), delay);
+                });
                 services.AddTransient<ValuationCalculator>();
                 services.AddTransient<ValuationSummaryCalculator>();
 

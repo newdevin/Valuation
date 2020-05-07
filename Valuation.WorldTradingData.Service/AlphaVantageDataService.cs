@@ -9,16 +9,16 @@ namespace Valuation.WorldTradingData.Service
 {
     public class AlphaVantageDataService : ITradingDataService
     {
-        
+
         private readonly Uri baseUri;
         private readonly IApiRepository apiRepository;
         private List<string> tokens;
         private static int index;
         private static readonly object lockObject = new object();
 
-        public AlphaVantageDataService( Uri baseUri, IApiRepository apiRepository)
+        public AlphaVantageDataService(Uri baseUri, IApiRepository apiRepository)
         {
-        
+
             this.baseUri = baseUri;
             this.apiRepository = apiRepository;
             GetTokens();
@@ -114,7 +114,7 @@ namespace Valuation.WorldTradingData.Service
                         {
                             volume = vol;
                         }
-                        
+
                         return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
                     }).Where(eod => eod.ClosePrice.HasValue);
         }
@@ -130,6 +130,27 @@ namespace Valuation.WorldTradingData.Service
                        decimal.TryParse(p[4], out decimal rate);
                        return new CurrencyRate { From = symbol, Day = day, To = "GBP", Rate = rate };
                    });
+        }
+
+        public Uri GetQuoteUri(string symbol, string suffix)
+        {
+            //https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=IBM&apikey=demo&datatype=csv
+            var sym = $"{symbol}";
+            if (!string.IsNullOrEmpty(suffix))
+                sym = $"{sym}.{suffix}";
+            var size = "compact";
+
+            var uriString = $"{baseUri}query?function=GLOBAL_QUOTE&symbol={sym}&apikey={GetKey()}&datatype=csv&outputsize={size}";
+            return new Uri(uriString);
+        }
+
+        public Quote GetQuote(string data, Listing listing)
+        {
+            //symbol	open	high	low	price	volume	latestDay	previousClose	change	changePercent
+            var d = data.Split(",", StringSplitOptions.None);
+            decimal.TryParse(d[4], out decimal price);
+            DateTime.TryParse(d[6], out DateTime day);
+            return new Quote(listing, price, day);
         }
     }
 }
