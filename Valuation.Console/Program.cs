@@ -68,7 +68,7 @@ namespace Valuation.Console
                 services.AddTransient<ISellTradeRepository, SellTradeRepository>();
                 services.AddTransient<IValuationLogService, ValuatinLogService>();
                 services.AddTransient<IProviderRepository, ProviderRepository>();
-                services.AddTransient<ITargetSellPriceRepostiory, TargetSellPriceRepostiory>();
+                services.AddTransient<ITargetPriceRepostiory, TargetPriceRepostiory>();
                 services.AddTransient<IEndOfDayPriceDownloadService, EndOfDayPriceDownloadService>(s =>
                 {
                     return new EndOfDayPriceDownloadService(s.GetService<ILogger<EndOfDayPriceDownloadService>>(), s.GetService<ITradingDataService>(),
@@ -102,10 +102,12 @@ namespace Valuation.Console
                         serviceName, fromAddress, fromName, toAddress, smtpServer, port);
                 });
                 services.AddTransient<IPriceAlertService, PriceAlertSerice>();
-                services.AddTransient<ITargetSellPriceReachedService, TargetSellPriceReachedService>();
+                services.AddTransient<ITargetPriceReachedService, TargetPriceReachedService>();
                 services.AddTransient<IProviderService, ProviderService>();
-                services.AddTransient<IQuoteService, AlphaVantageQuoteService>(s=>
+                services.AddTransient<IQuoteService, AlphaVantageQuoteService>(s =>
                 {
+                    int.TryParse(hostContext.Configuration["QuoteDelayInMinutes"], out int quoteDelayInMinutes);
+                    quoteDelayInMinutes = (quoteDelayInMinutes == 0) ? 15 : quoteDelayInMinutes;
                     return new AlphaVantageQuoteService(s.GetService<ILogger<AlphaVantageQuoteService>>(), s.GetService<ITradingDataService>(),
                         s.GetService<IHttpClientFactory>(), delay);
                 });

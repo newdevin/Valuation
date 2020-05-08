@@ -43,7 +43,7 @@ namespace Valuation.Repository
         public DbSet<BuyTrade> BuyTrades { get; set; }
         public DbSet<SellTrade> SellTrades { get; set; }
         public DbSet<ValuationLogEntity> ValuationLogs { get; set; }
-        public DbSet<TargetSellPriceEntity> TargetSellPrices { get; set; }
+        public DbSet<TargetPriceEntity> TargetPrices { get; set; }
         public DbSet<ProviderEntity> Providers { get; set; }
 
     }

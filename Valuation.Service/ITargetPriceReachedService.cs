@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Valuation.Service
 {
-    public interface ITargetSellPriceReachedService
+    public interface ITargetPriceReachedService
     {
-        Task<IEnumerable<TargetSellPrice>> GetTargetSellPrices();
+        Task<IEnumerable<TargetPrice>> GetTargetPrices();
         Task SetNotified(IEnumerable<int> ListingIds);
     }
 

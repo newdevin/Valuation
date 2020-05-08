@@ -23,6 +23,8 @@ namespace Valuation.Console
         private bool monitorPrices = false;
         private bool monitorPricesIsStopped = false;
 
+        private readonly int quoteDelayInMinutes = 15;
+
         private DateTime? endOfDayPriceDownloadedDateTime;
         private DateTime? currencyRatesDownloadedDateTime;
         private DateTime? valuationRunDateTime;
@@ -50,6 +52,9 @@ namespace Valuation.Console
             this.priceAlertService = priceAlertService;
             this.configuration = configuration;
             this.notificationService = notificationService;
+
+            if (!int.TryParse(configuration["QuoteDelayInMinutes"], out quoteDelayInMinutes))
+                quoteDelayInMinutes = 15;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -96,27 +101,40 @@ namespace Valuation.Console
             {
                 while (true)
                 {
-                    if (token.IsCancellationRequested)
-                        return;
-                    if (monitorPrices == false)
+                    try
                     {
-                        monitorPricesIsStopped = true;
-                        logger.LogInformation("Monitor prices is now PAUSED");
-                        await Task.Delay(TimeSpan.FromMinutes(1));
-                        continue;
-                    }
-                    monitorPricesIsStopped = false;
-                    logger.LogInformation("Monitor prices is now ACTIVE");
-                    await priceAlertService.CheckAndSendAlert();
-                    monitorPricesIsStopped = true;
-                    for (int i = 0; i < 15; i++)
-                    {
+                        if (token.IsCancellationRequested)
+                            return;
                         if (monitorPrices == false)
-                            break;
-                        await Task.Delay(TimeSpan.FromMinutes(1));
+                        {
+                            monitorPricesIsStopped = true;
+                            logger.LogInformation("Monitor prices is now PAUSED");
+                            await Task.Delay(TimeSpan.FromMinutes(1));
+                            continue;
+                        }
+                        monitorPricesIsStopped = false;
+                        logger.LogInformation("Monitor prices is now ACTIVE");
+                        await priceAlertService.CheckAndSendAlert();
+                        monitorPricesIsStopped = true;
+                        await AwaitAsync(quoteDelayInMinutes);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e.ToString());
+                        await AwaitAsync(quoteDelayInMinutes);
                     }
                 }
             });
+        }
+
+        private async Task AwaitAsync(int minutes)
+        {
+            for (int i = 0; i < minutes; i++)
+            {
+                if (monitorPrices == false)
+                    break;
+                await Task.Delay(TimeSpan.FromMinutes(1));
+            }
         }
 
         private async Task RunValuation()
@@ -133,15 +151,12 @@ namespace Valuation.Console
         {
             if (valuationRunDateTime.HasValue && valuationRunDateTime.Value == DateTime.Now.Date)
                 return true;
-            else
+            if (await valuationLogService.HasValuationServiceRunOn(DateTime.Now.Date))
             {
-                if (await valuationLogService.HasValuationServiceRunOn(DateTime.Now.Date))
-                {
-                    valuationRunDateTime = DateTime.Now.Date;
-                    return true;
-                }
-                return false;
+                valuationRunDateTime = DateTime.Now.Date;
+                return true;
             }
+            return false;
         }
 
         private bool AllDownloadSucceeded()

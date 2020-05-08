@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Valuation.Repository
+namespace Valuation.Repository.Entities
 {
     [Table("Provider")]
     public class ProviderEntity

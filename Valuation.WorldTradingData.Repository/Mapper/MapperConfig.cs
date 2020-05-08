@@ -19,7 +19,7 @@ namespace Valuation.Repository.Mapper
             MapEndOfDayPrice();
             MapListingVolume();
             MapValuation();
-            MapTargetSellPrices();
+            MapTargetPrices();
             MapProvider();
         }
 
@@ -30,18 +30,18 @@ namespace Valuation.Repository.Mapper
                 .ReverseMap();
         }
 
-        private void MapTargetSellPrices()
+        private void MapTargetPrices()
         {
-            CreateMap<TargetSellPriceEntity, TargetSellPrice>()
-                .ConstructUsing((entity, ctx) => new TargetSellPrice(ctx.Mapper.Map<Listing>(entity.Listing), entity.TargetPrice));
-                
+            CreateMap<TargetPriceEntity, TargetPrice>()
+                .ConstructUsing((entity, ctx) => new TargetPrice(ctx.Mapper.Map<Listing>(entity.Listing), entity.TargetPrice, entity.TargetType));
+
 
         }
 
         private void MapValuation()
         {
             CreateMap<ListingValuationEntity, ListingValuation>()
-                .ForMember(dest => dest.Currency, opt=> opt.MapFrom(src=> src.ShareCurrency))
+                .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.ShareCurrency))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.SharePrice))
                 .ReverseMap();
         }
@@ -69,7 +69,7 @@ namespace Valuation.Repository.Mapper
                 .ReverseMap();
 
             CreateMap<IEnumerable<ListingEntity>, IEnumerable<Listing>>()
-                .ConstructUsing((entities, ctx) =>  entities.Select(entity=> new Listing(entity.Id, ctx.Mapper.Map<Company>(entity.Company), ctx.Mapper.Map<Exchange>(entity.Exchange), ctx.Mapper.Map<Currency>(entity.Currency), entity.Symbol, entity.Suffix)))
+                .ConstructUsing((entities, ctx) => entities.Select(entity => new Listing(entity.Id, ctx.Mapper.Map<Company>(entity.Company), ctx.Mapper.Map<Exchange>(entity.Exchange), ctx.Mapper.Map<Currency>(entity.Currency), entity.Symbol, entity.Suffix)))
                 .ReverseMap();
         }
 
