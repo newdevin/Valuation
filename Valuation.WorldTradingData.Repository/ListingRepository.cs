@@ -38,15 +38,6 @@ namespace Valuation.Repository
         public async Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastPriceFetchDay()
         {
 
-            //var allListingEntities = await context.ListingVolumes
-            //    .Include(lv => lv.Listing.Currency).ToListAsync();
-                        
-            //var activeListingVolumeEntities = allListingEntities
-            //                        .GroupBy(lv => lv.ListingId, lv => lv)
-            //                        .Select(x => x.OrderByDescending(p => p.Day).FirstOrDefault())
-            //                        .Where(x => x.Quantity > 0)
-            //                        .ToList();
-
             var eodPrices = await context.EndOfDayPrices
                                     .AsNoTracking()
                                     .Where(eodPrice => eodPrice.Day == context.EndOfDayPrices.Where(al => al.Listing.Id == eodPrice.Listing.Id).Max(al => al.Day))

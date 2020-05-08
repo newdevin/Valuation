@@ -59,7 +59,7 @@ namespace Valuation.WorldTradingData.Service
             {
                 var data = await response.Content.ReadAsStringAsync();
 
-                var allLines = data.Split("\n");
+                var allLines = data.Split("\n", StringSplitOptions.RemoveEmptyEntries);
                 var dataLines = allLines.Skip(1);
                 return tradingDataService.GetQuote(dataLines.FirstOrDefault(), listing);
             }

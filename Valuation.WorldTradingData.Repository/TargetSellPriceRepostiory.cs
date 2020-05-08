@@ -23,7 +23,7 @@ namespace Valuation.Repository
         public async Task<IEnumerable<TargetSellPrice>> GetTargetSellPrices()
         {
             var entities = await context.TargetSellPrices
-                .Include(t=> t.Listing)
+                .Include(t=> t.Listing.Currency)
                 .Where(t => t.PriceReachedOn == null)
                 .ToListAsync();
             return entities.Select(mapper.MapTo<TargetSellPrice>);
