@@ -41,7 +41,7 @@ namespace Valuation.Service
         private async Task CheckQuotes(IEnumerable<TargetSellPrice> targetSellPrices, List<Listing> listings)
         {
             var quotes = await quoteService.GetQuotes(listings);
-
+            quotes = quotes.Where(q => !q.IsEmpty).ToList();
             var targetReachedPrices = targetSellPrices
                 .Select(tp => (tp, quotes.FirstOrDefault(p => tp.Listing.Id == p.Listing.Id)))
                 .Where(it => it.Item2 != null && it.Item2.Price.HasValue && it.tp.IsTargetSellPriceReached(it.Item2.Price.Value))

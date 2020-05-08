@@ -17,6 +17,7 @@ namespace Valuation.Domain
         public decimal? Price { get; }
         public DateTime? Day { get; }
 
+        public bool IsEmpty { get { return Listing is null; } }
 
         public static Quote Empty()
         {
