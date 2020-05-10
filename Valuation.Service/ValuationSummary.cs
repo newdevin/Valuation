@@ -11,5 +11,7 @@ namespace Valuation.Service
         public decimal TotalRealisedInGbp { get; set; }
         public decimal TotalSellInGbp { get; set; }
         public decimal TotalProfitInGbp { get; set; }
+        public decimal TotalCashInvestedInGbp { get; set; }
+        public decimal TotalCashWithdrawnInGbp { get; set; }
     }
 }
