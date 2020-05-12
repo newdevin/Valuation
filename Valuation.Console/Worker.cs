@@ -92,7 +92,7 @@ namespace Valuation.Console
 
         private static string ConsturctMessage(PortfolioValuation val)
         {
-            return $"Total Value of portfolio : {(int)val.ValuationSummary.ValuationInGbp:n0} GBP. NetProfit : {val.ValuationSummary.TotalProfitInGbp}Total valuation changed since day before : {(int)val.TotalValuationChange:n0} GBP.";
+            return $"Total Value of portfolio : {(int)val.ValuationSummary.ValuationInGbp:n0} GBP. NetProfit : {val.ValuationSummary.TotalProfitInGbp:n0}. Total valuation changed since day before : {(int)val.TotalValuationChange:n0} GBP.";
         }
 
         private void MonitorPrices(CancellationToken token)

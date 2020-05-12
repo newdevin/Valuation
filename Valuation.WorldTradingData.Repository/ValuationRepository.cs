@@ -39,6 +39,8 @@ namespace Valuation.Repository
                 TotalRealisedChange = summary1.TotalRealisedInGbp - summary2.TotalRealisedInGbp,
                 TotalSellChanged = summary1.TotalSellInGbp - summary2.TotalSellInGbp,
                 TotalValuationChange = summary1.ValuationInGbp - summary2.ValuationInGbp,
+                TotalCashInvestedInGbp = summary1.TotalCashInvestedInGbp - summary2.TotalCashInvestedInGbp,
+                TotalCashWithdrawnInGbp = summary1.TotalCashWithdrawnInGbp - summary2.TotalCashWithdrawnInGbp
             };
 
         }
