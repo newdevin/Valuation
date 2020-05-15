@@ -100,7 +100,7 @@ namespace Valuation.Console
             message.AppendLine($"Total Value of portfolio : <b>{(int)val.ValuationSummary.ValuationInGbp:n2}</b> GBP. NetProfit :<b> {val.ValuationSummary.TotalProfitInGbp:n2} </b>GBP. Total valuation changed since previous business day :<b style= 'color:{color}'> {(int)val.TotalValuationChange:n2}</b> GBP.");
             message.AppendLine("<TABLE><TR><TH>Symbol</TH><TH>Currency</TH><TH>Current Price</TH><TH>Previous Price</TH><TH>Change</TH><TH>% Change</TH></TR>");
             val.ListingValuationSummaries
-                .OrderBy(s => s.Change)
+                .OrderBy(s => s.PercentChange)
                 .ToList()
                 .ForEach(s =>
                 {
