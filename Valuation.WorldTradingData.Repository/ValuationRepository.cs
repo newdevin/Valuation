@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Valuation.Common;
 using Valuation.Domain;
 using Valuation.Repository.Entities;
 using Valuation.Repository.Mapper;
@@ -24,23 +25,51 @@ namespace Valuation.Repository
             this.mapper = mapper;
         }
 
-        public async Task<PortfolioValuation> GetPortfolioValuation(DateTime onDay)
+        public async Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime onDay)
         {
             var day = onDay.Date;
-            var summaries = await context.ValuationSummaries.Where(vs => vs.Day == day.Date || vs.Day == day.AddDays(-1).Date).ToListAsync();
-            var summary1 = summaries.FirstOrDefault(e => e.Day == day);
-            var summary2 = summaries.FirstOrDefault(e => e.Day == day.AddDays(-1).Date);
-
-            return new PortfolioValuation
+            if (onDay.IsWeekend())
             {
-                ValuationSummary = summary1,
-                TotalCostChange = summary1.TotalCostInGbp - summary2.TotalCostInGbp,
-                TotalProfitChange = summary1.TotalProfitInGbp - summary2.TotalProfitInGbp,
-                TotalRealisedChange = summary1.TotalRealisedInGbp - summary2.TotalRealisedInGbp,
-                TotalSellChanged = summary1.TotalSellInGbp - summary2.TotalSellInGbp,
-                TotalValuationChange = summary1.ValuationInGbp - summary2.ValuationInGbp,
-                TotalCashInvestedInGbp = summary1.TotalCashInvestedInGbp - summary2.TotalCashInvestedInGbp,
-                TotalCashWithdrawnInGbp = summary1.TotalCashWithdrawnInGbp - summary2.TotalCashWithdrawnInGbp
+                day = (onDay.DayOfWeek == DayOfWeek.Saturday) ? onDay.Date.AddDays(-1) : onDay.Date.AddDays(-2);
+            }
+
+            var previousDay = day.AddDays(-1).Date;
+            var summaries = await context.ValuationSummaries
+                .Where(vs => vs.Day == day.Date || vs.Day == previousDay)
+                .ToListAsync();
+            var currentSummary = summaries.FirstOrDefault(e => e.Day == day);
+            var previousDaySummary = summaries.FirstOrDefault(e => e.Day == previousDay);
+
+
+            var prices = await context.EndOfDayPrices
+                .Include(eod => eod.Listing.Currency)
+                .Where(eod => eod.Day == day || eod.Day == previousDay)
+                .ToListAsync();
+
+            var currentPrices = prices.Where(p => p.Day == day).ToList();
+            var previousPrices = prices.Where(p => p.Day == previousDay).ToList();
+
+            var listingValuationSummaries = currentPrices.Join(previousPrices, c => c.ListingId, p => p.ListingId,
+                (c, p) => new ListingValuationSummary
+                {
+                    Listing = mapper.MapTo<Listing>(c.Listing),
+                    Day = day,
+                    CurrentShareValue = c.Close,
+                    PreviousBusinessDayShareValue = p.Close,
+                    Currency = mapper.MapTo<Currency>(c.Listing.Currency)
+                });
+
+            return new PortfolioValuationSummary
+            {
+                ValuationSummary = currentSummary,
+                ListingValuationSummaries = listingValuationSummaries,
+                TotalCostChange = currentSummary.TotalCostInGbp - previousDaySummary.TotalCostInGbp,
+                TotalProfitChange = currentSummary.TotalProfitInGbp - previousDaySummary.TotalProfitInGbp,
+                TotalRealisedChange = currentSummary.TotalRealisedInGbp - previousDaySummary.TotalRealisedInGbp,
+                TotalSellChanged = currentSummary.TotalSellInGbp - previousDaySummary.TotalSellInGbp,
+                TotalValuationChange = currentSummary.ValuationInGbp - previousDaySummary.ValuationInGbp,
+                TotalCashInvestedInGbp = currentSummary.TotalCashInvestedInGbp - previousDaySummary.TotalCashInvestedInGbp,
+                TotalCashWithdrawnInGbp = currentSummary.TotalCashWithdrawnInGbp - previousDaySummary.TotalCashWithdrawnInGbp
             };
 
         }

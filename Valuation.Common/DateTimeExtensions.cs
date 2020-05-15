@@ -16,5 +16,10 @@ namespace Valuation.Common
                 minDate = minDate.AddDays(1);
             }
         }
+
+        public static bool IsWeekend(this DateTime day)
+        {
+            return day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday;
+        }
     }
 }

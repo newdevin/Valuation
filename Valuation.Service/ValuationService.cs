@@ -39,7 +39,7 @@ namespace Valuation.Service
             this.valuationSummaryCalculator = valuationSummaryCalculator;
         }
 
-        public Task<PortfolioValuation> GetPortfolioValuation(DateTime day)
+        public Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime day)
         {
             return valuationRepository.GetPortfolioValuation(day);
         }

@@ -13,8 +13,8 @@ namespace Valuation.Service
         Task ValuePortfolio(DateTime upToDateTime);
         Task<IEnumerable<ValuationSummary>> GetValuationSummary();
         Task<IEnumerable<ListingValuation>> GetValuations(DateTime date);
+        Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime day);
 
-        Task<PortfolioValuation> GetPortfolioValuation(DateTime day);
     }
 
 }

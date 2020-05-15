@@ -43,7 +43,7 @@ namespace Valuation.Service
                 Credentials = new NetworkCredential(fromAddress, provider.Key)
             };
 
-            var mailMessage = new MailMessage();
+            var mailMessage = new MailMessage() { IsBodyHtml = true };
             mailMessage.From = new MailAddress(fromAddress, fromName); ;
             foreach (var to in toAddress.Split(new char[] { ',', ';', ' ' }, System.StringSplitOptions.RemoveEmptyEntries))
             {

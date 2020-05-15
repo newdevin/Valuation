@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Valuation.Service;
@@ -90,9 +92,27 @@ namespace Valuation.Console
             logger.LogInformation($"Portfolio valuation notification sent");
         }
 
-        private static string ConsturctMessage(PortfolioValuation val)
+        private static string ConsturctMessage(PortfolioValuationSummary val)
         {
-            return $"Total Value of portfolio : {(int)val.ValuationSummary.ValuationInGbp:n0} GBP. NetProfit : {val.ValuationSummary.TotalProfitInGbp:n0}. Total valuation changed since day before : {(int)val.TotalValuationChange:n0} GBP.";
+            var color = val.TotalValuationChange>= 0 ? "Green" : "Red";
+            var message = new StringBuilder();
+            message.AppendLine("<HTML>");
+            message.AppendLine($"Total Value of portfolio : <b>{(int)val.ValuationSummary.ValuationInGbp:n2}</b> GBP. NetProfit :<b> {val.ValuationSummary.TotalProfitInGbp:n2} </b>GBP. Total valuation changed since previous business day :<b style= 'color:{color}'> {(int)val.TotalValuationChange:n2}</b> GBP.");
+            message.AppendLine("<TABLE><TR><TH>Symbol</TH><TH>Currency</TH><TH>Current Price</TH><TH>Previous Price</TH><TH>Change</TH><TH>% Change</TH></TR>");
+            val.ListingValuationSummaries
+                .OrderBy(s => s.Change)
+                .ToList()
+                .ForEach(s =>
+                {
+                    var color = (s.Change >= 0 ? "Green" : "Red");
+                    message.AppendLine("<TR>");
+                    message.AppendLine($"<TH> {s.Listing.Symbol} </TH><TH>{s.Currency.Symbol}</TH><TH>{s.CurrentShareValue:n2}</TH><TH>{s.PreviousBusinessDayShareValue:n2}</TH>" +
+                        $"<TH style='color:{color}'>{s.Change:n2}</TH><TH style='color:{color}'>{s.PercentChange:n2}</TH>");
+                    message.AppendLine("</TR>");
+                });
+
+            message.AppendLine("</HTML>");
+            return message.ToString();
         }
 
         private void MonitorPrices(CancellationToken token)
