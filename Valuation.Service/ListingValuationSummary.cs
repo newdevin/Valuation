@@ -25,5 +25,20 @@ namespace Valuation.Service
                 return (CurrentShareValue - PreviousBusinessDayShareValue)/PreviousBusinessDayShareValue * 100;
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as ListingValuationSummary;
+            if(other != null)
+            {
+                return this.Listing.Id == other.Listing.Id && this.Day.Date == other.Day.Date;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return Listing.Id.GetHashCode() ^ Day.Date.GetHashCode();
+        }
     }
 }

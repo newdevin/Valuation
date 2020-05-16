@@ -49,15 +49,39 @@ namespace Valuation.Repository
             var currentPrices = prices.Where(p => p.Day == day).ToList();
             var previousPrices = prices.Where(p => p.Day == previousDay).ToList();
 
-            var listingValuationSummaries = currentPrices.Join(previousPrices, c => c.ListingId, p => p.ListingId,
-                (c, p) => new ListingValuationSummary
+            var listingValuationSummaries1 = previousPrices
+                .GroupJoin(currentPrices, p => p.ListingId, c => c.ListingId,
+                    (p, c) => new { Previous = p, Current = c.DefaultIfEmpty() })
+                .Select(x =>
                 {
-                    Listing = mapper.MapTo<Listing>(c.Listing),
-                    Day = day,
-                    CurrentShareValue = c.Close,
-                    PreviousBusinessDayShareValue = p.Close,
-                    Currency = mapper.MapTo<Currency>(c.Listing.Currency)
+                    return new ListingValuationSummary
+                    {
+                        Listing = mapper.MapTo<Listing>(x?.Previous?.Listing),
+                        Day = day,
+                        CurrentShareValue = x.Current?.First()?.Close,
+                        PreviousBusinessDayShareValue = x.Previous?.Close,
+                        Currency = mapper.MapTo<Currency>(x.Previous?.Listing?.Currency)
+                    };
                 });
+
+            var listingValuationSummaries2 = currentPrices
+                .GroupJoin(previousPrices, c => c.ListingId, p => p.ListingId,
+                    (c, p) => new { Current = c , Previous = p.DefaultIfEmpty()})
+                .Select(x =>
+                {
+                    return new ListingValuationSummary
+                    {
+                        Listing = mapper.MapTo<Listing>(x?.Current?.Listing),
+                        Day = day,
+                        CurrentShareValue = x.Current?.Close,
+                        PreviousBusinessDayShareValue = x.Previous?.First()?.Close,
+                        Currency = mapper.MapTo<Currency>(x.Current?.Listing?.Currency)
+                    };
+                });
+            var listingValuationSummaries = listingValuationSummaries1
+                .Union(listingValuationSummaries2)
+                .Distinct()
+                .ToList();
 
             return new PortfolioValuationSummary
             {
