@@ -10,8 +10,10 @@ namespace Valuation.Service
     public interface IListingService
     {
         Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastEodPriceDateTime();
+        
         Task<IEnumerable<ListingVolume>> GetListingVolumes();
-
+        
         Task<IEnumerable<ListingVolume>> GetActiveListingVolumes();
+        Task<IEnumerable<ListingVolume>> GetActiveListingVolumesOnDay(DateTime day);
     }
 }

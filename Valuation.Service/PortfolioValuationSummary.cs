@@ -11,8 +11,8 @@ namespace Valuation.Service
         public decimal TotalProfitChange { get; set; }
         public decimal TotalRealisedChange { get; set; }
         public decimal TotalSellChanged { get; set; }
-        public decimal TotalCashInvestedInGbp { get; set; }
-        public decimal TotalCashWithdrawnInGbp { get; set; }
+        public decimal TotalCashInvestedChange { get; set; }
+        public decimal TotalCashWithdrawnChange { get; set; }
 
     }
 }

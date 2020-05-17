@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 
 using System.Threading.Tasks;
@@ -61,6 +62,15 @@ namespace Valuation.Repository
                 .ToList();
             context.EndOfDayPrices.AddRange(entities);
             await context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPriceOnDay(DateTime day)
+        {
+            var entities = await context.EndOfDayPrices
+                .Include(eod => eod.Listing.Currency)
+                .Where(eod => eod.Day.Date == day.Date)
+                .ToListAsync();
+            return entities.Select(mapper.MapTo<EndOfDayPrice>);
         }
     }
 }

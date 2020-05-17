@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LanguageExt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,17 +17,13 @@ namespace Valuation.Service
         private readonly IValuationRepository valuationRepository;
         private readonly IBuyTradeRepository buyTradeRepository;
         private readonly ISellTradeRepository sellTradeRepository;
-        private readonly ValuationCalculator valuationCalculator;
-        private readonly ValuationSummaryCalculator valuationSummaryCalculator;
 
         public ValuationService(IEndOfDayPriceService endOfDayPriceService,
             ICurrencyRateService currencyRateService,
             IListingService listingService,
             IValuationRepository valuationRepository,
             IBuyTradeRepository buyTradeRepository,
-            ISellTradeRepository sellTradeRepository,
-            ValuationCalculator valuationCalculator,
-            ValuationSummaryCalculator valuationSummaryCalculator
+            ISellTradeRepository sellTradeRepository
             )
         {
             this.endOfDayPriceService = endOfDayPriceService;
@@ -35,13 +32,84 @@ namespace Valuation.Service
             this.valuationRepository = valuationRepository;
             this.buyTradeRepository = buyTradeRepository;
             this.sellTradeRepository = sellTradeRepository;
-            this.valuationCalculator = valuationCalculator;
-            this.valuationSummaryCalculator = valuationSummaryCalculator;
         }
 
-        public Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime day)
+        public async Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime onDay)
         {
-            return valuationRepository.GetPortfolioValuation(day);
+            var day = onDay.Date;
+            if (onDay.IsWeekend())
+            {
+                day = (onDay.DayOfWeek == DayOfWeek.Saturday) ? onDay.Date.AddDays(-1) : onDay.Date.AddDays(-2);
+            }
+            var previousDay = day.AddDays(-1).Date;
+
+            var listingValuationSummaries = await GetListingValuationSummary(day, previousDay);
+
+            var currentSummary = await valuationRepository.GetValuationSummaryOnDay(day);
+            var previousSummary = await valuationRepository.GetValuationSummaryOnDay(previousDay);
+
+            return new PortfolioValuationSummary
+            {
+                ValuationSummary = currentSummary,
+                ListingValuationSummaries = listingValuationSummaries,
+                TotalCostChange = currentSummary.TotalCostInGbp - previousSummary.TotalCostInGbp,
+                TotalProfitChange = currentSummary.TotalProfitInGbp - previousSummary.TotalProfitInGbp,
+                TotalRealisedChange = currentSummary.TotalRealisedInGbp - previousSummary.TotalRealisedInGbp,
+                TotalSellChanged = currentSummary.TotalSellInGbp - previousSummary.TotalSellInGbp,
+                TotalValuationChange = currentSummary.ValuationInGbp - previousSummary.ValuationInGbp,
+                TotalCashInvestedChange = currentSummary.TotalCashInvestedInGbp - previousSummary.TotalCashInvestedInGbp,
+                TotalCashWithdrawnChange = currentSummary.TotalCashWithdrawnInGbp - previousSummary.TotalCashWithdrawnInGbp
+            };
+
+        }
+
+        private async Task<IEnumerable<ListingValuationSummary>> GetListingValuationSummary(DateTime day, DateTime previousDay)
+        {
+            var currentListingVolumes = await listingService.GetActiveListingVolumesOnDay(day);
+            var currentListingIds = currentListingVolumes.Select(lv => lv.Listing.Id);
+            var currentPrices = await endOfDayPriceService.GetPrices(day, currentListingIds);
+
+            var previousListingVolume = await listingService.GetActiveListingVolumesOnDay(previousDay);
+            var previousListingIds = previousListingVolume.Select(lv => lv.Listing.Id);
+            var previousPrices = await endOfDayPriceService.GetPrices(previousDay, previousListingIds);
+
+            var listingValuationSummaries1 = previousPrices
+                .GroupJoin(currentPrices, p => p.ListingId, c => c.ListingId,
+                    (p, c) => new { Previous = p, Current = c.DefaultIfEmpty() })
+                .Select(x =>
+                {
+                    var listing = previousListingVolume.First(l => l.Listing.Id == x.Previous.ListingId).Listing;
+                    return new ListingValuationSummary
+                    {
+                        Listing = listing,
+                        Day = day,
+                        CurrentShareValue = x.Current?.First()?.ClosePrice,
+                        PreviousBusinessDayShareValue = x.Previous?.ClosePrice,
+                        Currency = listing.Currency
+                    };
+                });
+
+            var listingValuationSummaries2 = currentPrices
+                .GroupJoin(previousPrices, c => c.ListingId, p => p.ListingId,
+                    (c, p) => new { Current = c, Previous = p.DefaultIfEmpty() })
+                .Select(x =>
+                {
+                    var listing = previousListingVolume.First(l => l.Listing.Id == x.Current.ListingId).Listing;
+                    return new ListingValuationSummary
+                    {
+                        Listing = listing,
+                        Day = day,
+                        CurrentShareValue = x.Current?.ClosePrice,
+                        PreviousBusinessDayShareValue = x.Previous?.First()?.ClosePrice,
+                        Currency = listing.Currency
+                    };
+                });
+            var listingValuationSummaries = listingValuationSummaries1
+                .Union(listingValuationSummaries2)
+                .Distinct()
+                .ToList();
+
+            return listingValuationSummaries;
         }
 
         public Task<IEnumerable<ListingValuation>> GetValuations(DateTime day)
@@ -54,23 +122,23 @@ namespace Valuation.Service
             return valuationRepository.GetValuationSummary();
         }
 
-        public async Task ValuePortfolio(DateTime upToDate)
-        {
-            //throw new NotImplementedException();
-            var listingVolumes = await listingService.GetListingVolumes();
-            var firstDay = listingVolumes.Min(lv => lv.Day);
+        //public async Task ValuePortfolio(DateTime upToDate)
+        //{
+        //    //throw new NotImplementedException();
+        //    var listingVolumes = await listingService.GetListingVolumes();
+        //    var firstDay = listingVolumes.Min(lv => lv.Day);
 
-            var eodPrices = await endOfDayPriceService.GetEndOfDayPriceSince(firstDay);
-            var currencyRates = await currencyRateService.GetCurencyRatesSince(firstDay);
+        //    var eodPrices = await endOfDayPriceService.GetEndOfDayPriceSince(firstDay);
+        //    var currencyRates = await currencyRateService.GetCurencyRatesSince(firstDay);
 
-            var valuations = valuationCalculator.GetValuations(upToDate, listingVolumes, eodPrices, currencyRates);
-            var buyTrades = await buyTradeRepository.GetBuyTrades();
-            var sellTrades = await sellTradeRepository.GetSellTrades();
+        //    var valuations = valuationCalculator.GetValuations(upToDate, listingVolumes, eodPrices, currencyRates);
+        //    var buyTrades = await buyTradeRepository.GetBuyTrades();
+        //    var sellTrades = await sellTradeRepository.GetSellTrades();
 
-            var summary = valuationSummaryCalculator.GetSummary(buyTrades, sellTrades, valuations);
+        //    var summary = valuationSummaryCalculator.GetSummary(buyTrades, sellTrades, valuations);
 
-            await valuationRepository.Save(valuations, summary);
-        }
+        //    await valuationRepository.Save(valuations, summary);
+        //}
 
         public Task ValuePortfolio()
         {

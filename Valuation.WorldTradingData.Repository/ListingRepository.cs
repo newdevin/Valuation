@@ -22,17 +22,30 @@ namespace Valuation.Repository
             this.mapper = mapper;
         }
 
-        public async Task<IEnumerable<ListingVolume>> GetActiveListingVolumes()
+        public Task<IEnumerable<ListingVolume>> GetActiveListingVolumes()
+        {
+            return GetListingVolumesOnDay(null);
+        }
+        private async Task<IEnumerable<ListingVolume>> GetListingVolumesOnDay(DateTime? day)
         {
             var allListingEntities = await context.ListingVolumes
-                .Include(lv => lv.Listing.Currency).ToListAsync();
+                                        .Include(lv => lv.Listing.Currency)
+                                        .Where(lv => (day.HasValue && lv.Day <= day) || day == null)
+                                        .ToListAsync();
 
             var activeListingVolumeEntities = allListingEntities
                                     .GroupBy(lv => lv.ListingId, lv => lv)
                                     .Select(x => x.OrderByDescending(p => p.Day).FirstOrDefault())
                                     .Where(x => x.Quantity > 0)
                                     .ToList();
+
+
             return activeListingVolumeEntities.Select(mapper.MapTo<ListingVolume>).ToList();
+        }
+
+        public Task<IEnumerable<ListingVolume>> GetActiveListingVolumesOnDay(DateTime day)
+        {
+            return GetListingVolumesOnDay(day);
         }
 
         public async Task<IEnumerable<Tuple<Listing, DateTime?>>> GetActiveListingWithLastPriceFetchDay()

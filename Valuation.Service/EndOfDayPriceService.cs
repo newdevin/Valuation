@@ -23,5 +23,10 @@ namespace Valuation.Service
         {
             return endOfDayPriceRepository.GetEndOfDayPriceSince(sinceDay);
         }
+
+        public Task<IEnumerable<EndOfDayPrice>> GetPrices(DateTime day, IEnumerable<int> listingIds)
+        {
+            return endOfDayPriceRepository.GetEndOfDayPriceOnDay(day);
+        }
     }
 }

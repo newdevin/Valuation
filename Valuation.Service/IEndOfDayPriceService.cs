@@ -10,5 +10,6 @@ namespace Valuation.Service
         Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPriceSince(DateTime sinceDay);
 
         Task<IEnumerable<EndOfDayPrice>> GetLatestEndOfDayPrices(IEnumerable<int> listingIds);
+        Task<IEnumerable<EndOfDayPrice>> GetPrices(DateTime day, IEnumerable<int> listingIds);
     }
 }
