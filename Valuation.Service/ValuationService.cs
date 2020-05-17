@@ -36,18 +36,10 @@ namespace Valuation.Service
 
         public async Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime onDay)
         {
-            var day = onDay.Date;
-            if (onDay.IsWeekend())
-            {
-                day = (onDay.DayOfWeek == DayOfWeek.Saturday) ? onDay.Date.AddDays(-1) : onDay.Date.AddDays(-2);
-            }
-            var previousDay = day.AddDays(-1).Date;
+            var (day, previousDay)= GetCurrentAndPreviousDays(onDay);
+            var (currentSummary, previousSummary) = await GetCurrentAndPreviousSummaries(day, previousDay);
 
             var listingValuationSummaries = await GetListingValuationSummary(day, previousDay);
-
-            var currentSummary = await valuationRepository.GetValuationSummaryOnDay(day);
-            var previousSummary = await valuationRepository.GetValuationSummaryOnDay(previousDay);
-
             return new PortfolioValuationSummary
             {
                 ValuationSummary = currentSummary,
@@ -61,6 +53,27 @@ namespace Valuation.Service
                 TotalCashWithdrawnChange = currentSummary.TotalCashWithdrawnInGbp - previousSummary.TotalCashWithdrawnInGbp
             };
 
+        }
+
+        private async Task<(ValuationSummary,ValuationSummary)> GetCurrentAndPreviousSummaries(DateTime day, DateTime previousDay)
+        {
+
+            var task1 = valuationRepository.GetValuationSummaryOnDay(day);
+            var task2 = valuationRepository.GetValuationSummaryOnDay(previousDay);
+
+            await Task.WhenAll(task1, task2);
+            return (task1.Result, task2.Result);
+        }
+
+        private (DateTime , DateTime) GetCurrentAndPreviousDays(DateTime onDay)
+        {
+            var day = onDay.Date;
+            if (onDay.IsWeekend())
+            {
+                day = (onDay.DayOfWeek == DayOfWeek.Saturday) ? onDay.Date.AddDays(-1) : onDay.Date.AddDays(-2);
+            }
+            var previousDay = day.AddDays(-1).Date;
+            return (day, previousDay);
         }
 
         private async Task<IEnumerable<ListingValuationSummary>> GetListingValuationSummary(DateTime day, DateTime previousDay)
