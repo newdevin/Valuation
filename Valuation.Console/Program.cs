@@ -51,8 +51,8 @@ namespace Valuation.Console
                 services.AddAutoMapper(typeof(ObjectMapper));
 
                 var conStr = hostContext.Configuration.GetConnectionString("PicassoDbConnectionString");
-                var uriString = hostContext.Configuration["AlphaVantage"];
-                int.TryParse(hostContext.Configuration["delay"], out int delay);
+                var uriString = hostContext.Configuration["AlphaVantage:baseUri"];
+                int.TryParse(hostContext.Configuration["AlphaVantage:delay"], out int delay);
 
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr), ServiceLifetime.Transient);
 
@@ -106,7 +106,7 @@ namespace Valuation.Console
                 services.AddTransient<IProviderService, ProviderService>();
                 services.AddTransient<IQuoteService, AlphaVantageQuoteService>(s =>
                 {
-                    int.TryParse(hostContext.Configuration["QuoteDelayInMinutes"], out int quoteDelayInMinutes);
+                    int.TryParse(hostContext.Configuration["AlphaVantage:QuoteDelayInMinutes"], out int quoteDelayInMinutes);
                     quoteDelayInMinutes = (quoteDelayInMinutes == 0) ? 15 : quoteDelayInMinutes;
                     return new AlphaVantageQuoteService(s.GetService<ILogger<AlphaVantageQuoteService>>(), s.GetService<ITradingDataService>(),
                         s.GetService<IHttpClientFactory>(), delay);
