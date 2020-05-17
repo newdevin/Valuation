@@ -26,23 +26,18 @@ namespace Valuation.Repository
 
         public async Task<IEnumerable<EndOfDayPrice>> GetLatestEndOfDayPrices(IEnumerable<int> listingIds)
         {
-            var entities = new List<EndOfDayPriceEntity>();
 
-            foreach(var listingId in listingIds)
-            {
-                var entity = await context.EndOfDayPrices
-                    .Include(e=> e.Listing)
-                    .Where(e => e.ListingId == listingId).OrderByDescending(e => e.Day)
-                    .FirstOrDefaultAsync() ;
-                entities.Add(entity);
-            }
+            var entities = await context.EndOfDayPrices
+                .Include(e => e.Listing)
+                .Where(e => listingIds.Contains(e.ListingId) && e.Day == context.EndOfDayPrices.Where(e1=>e1.ListingId == e.ListingId).OrderByDescending(e2=> e2.Day).First().Day)
+                .ToListAsync();
 
             return entities.Select(mapper.MapTo<EndOfDayPrice>);
         }
 
         public async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPriceSince(DateTime sinceDay)
         {
-            var entities = await context.EndOfDayPrices.Include(e=> e.Listing)
+            var entities = await context.EndOfDayPrices.Include(e => e.Listing)
                 .Where(eod => eod.Day >= sinceDay)
                 .ToListAsync();
             return entities.Select(mapper.MapTo<EndOfDayPrice>);
