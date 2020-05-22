@@ -36,7 +36,7 @@ namespace Valuation.Service
 
         public async Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime onDay)
         {
-            var (day, previousDay)= GetCurrentAndPreviousDays(onDay);
+            var (day, previousDay) = GetCurrentAndPreviousDays(onDay);
             var (currentSummary, previousSummary) = await GetCurrentAndPreviousSummaries(day, previousDay);
 
             var listingValuationSummaries = await GetListingValuationSummary(day, previousDay);
@@ -55,17 +55,16 @@ namespace Valuation.Service
 
         }
 
-        private async Task<(ValuationSummary,ValuationSummary)> GetCurrentAndPreviousSummaries(DateTime day, DateTime previousDay)
+        private async Task<(ValuationSummary, ValuationSummary)> GetCurrentAndPreviousSummaries(DateTime day, DateTime previousDay)
         {
 
-            var task1 = valuationRepository.GetValuationSummaryOnDay(day);
-            var task2 = valuationRepository.GetValuationSummaryOnDay(previousDay);
+            var currentSummary = await valuationRepository.GetValuationSummaryOnDay(day);
+            var previousSummary = await valuationRepository.GetValuationSummaryOnDay(previousDay);
 
-            await Task.WhenAll(task1, task2);
-            return (task1.Result, task2.Result);
+            return (currentSummary, previousSummary);
         }
 
-        private (DateTime , DateTime) GetCurrentAndPreviousDays(DateTime onDay)
+        private (DateTime, DateTime) GetCurrentAndPreviousDays(DateTime onDay)
         {
             var day = onDay.Date;
             if (onDay.IsWeekend())

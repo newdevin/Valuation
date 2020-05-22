@@ -58,6 +58,7 @@ namespace Valuation.WorldTradingData.Service
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsStringAsync();
+                logger.LogInformation(data);
 
                 var allLines = data.Split("\n", StringSplitOptions.RemoveEmptyEntries);
                 var dataLines = allLines.Skip(1);
