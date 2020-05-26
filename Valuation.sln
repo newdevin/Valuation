@@ -25,7 +25,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Common", "Valuati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Common.Test", "Valuation.Common.Test\Valuation.Common.Test.csproj", "{205D9605-22F5-4E1E-869F-CA151B3C6974}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Valuation.Web", "Valuation.Web\Valuation.Web.csproj", "{B178ACE5-F400-4353-B3B2-A623B2D4DDFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Valuation.Web", "Valuation.Web\Valuation.Web.csproj", "{B178ACE5-F400-4353-B3B2-A623B2D4DDFC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3F30E32C-2989-4C74-9C7C-7B79360A3FFC}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		DockerFile = DockerFile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
