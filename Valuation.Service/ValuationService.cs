@@ -72,6 +72,10 @@ namespace Valuation.Service
                 day = (onDay.DayOfWeek == DayOfWeek.Saturday) ? onDay.Date.AddDays(-1) : onDay.Date.AddDays(-2);
             }
             var previousDay = day.AddDays(-1).Date;
+            if(previousDay.IsWeekend())
+            {
+                previousDay = (previousDay.DayOfWeek == DayOfWeek.Saturday) ? previousDay.Date.AddDays(-1) : previousDay.Date.AddDays(-2);
+            }
             return (day, previousDay);
         }
 
@@ -90,14 +94,14 @@ namespace Valuation.Service
                     (p, c) => new { Previous = p, Current = c.DefaultIfEmpty() })
                 .Select(x =>
                 {
-                    var listing = previousListingVolume.First(l => l.Listing.Id == x.Previous.ListingId).Listing;
+                    var listing = previousListingVolume.FirstOrDefault(l => l.Listing.Id == x.Previous.ListingId)?.Listing;
                     return new ListingValuationSummary
                     {
                         Listing = listing,
                         Day = day,
                         CurrentShareValue = x.Current?.First()?.ClosePrice,
                         PreviousBusinessDayShareValue = x.Previous?.ClosePrice,
-                        Currency = listing.Currency
+                        Currency = (listing != null) ? listing.Currency : null
                     };
                 });
 
@@ -106,14 +110,14 @@ namespace Valuation.Service
                     (c, p) => new { Current = c, Previous = p.DefaultIfEmpty() })
                 .Select(x =>
                 {
-                    var listing = previousListingVolume.First(l => l.Listing.Id == x.Current.ListingId).Listing;
+                    var listing = previousListingVolume.FirstOrDefault(l => l.Listing.Id == x.Current.ListingId)?.Listing;
                     return new ListingValuationSummary
                     {
                         Listing = listing,
                         Day = day,
                         CurrentShareValue = x.Current?.ClosePrice,
                         PreviousBusinessDayShareValue = x.Previous?.First()?.ClosePrice,
-                        Currency = listing.Currency
+                        Currency = (listing != null) ? listing.Currency : null
                     };
                 });
             var listingValuationSummaries = listingValuationSummaries1

@@ -1,15 +1,26 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/core/runtime:3.1-buster-slim AS base
 WORKDIR /app
 
-COPY ./Valuation.Console/*.csproj ./
-RUN dotnet restore
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+WORKDIR /src
+COPY ["Valuation.Console/Valuation.Console.csproj", "Valuation.Console/"]
+COPY ["Valuation.WorldTradingData.Service/Valuation.WorldTradingData.Service.csproj", "Valuation.WorldTradingData.Service/"]
+COPY ["Valuation.Service/Valuation.Service.csproj", "Valuation.Service/"]
+COPY ["Valuation.Common/Valuation.Common.csproj", "Valuation.Common/"]
+COPY ["Valuation.Domain/Valuation.Domain.csproj", "Valuation.Domain/"]
+COPY ["Valuation.WorldTradingData.Repository/Valuation.Repository.csproj", "Valuation.WorldTradingData.Repository/"]
+COPY ["Valuation.Infrastructure/Valuation.Infrastructure.csproj", "Valuation.Infrastructure/"]
+RUN dotnet restore "Valuation.Console/Valuation.Console.csproj"
+COPY . .
+WORKDIR "/src/Valuation.Console"
+RUN dotnet build "Valuation.Console.csproj" -c Release -o /app/build
 
-COPY . ./
-RUN dotnet publish -c Release -o out
+FROM build AS publish
+RUN dotnet publish "Valuation.Console.csproj" -c Release -o /app/publish
 
-
-FROM mcr.microsoft.com/dotnet/core/asp.net:3.1
+FROM base AS final
 WORKDIR /app
-EXPOSE 8085
-COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet" "AuthService.exe"]
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Valuation.Console.dll"]
