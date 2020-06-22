@@ -68,7 +68,7 @@ namespace Valuation.WorldTradingData.Service
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsStringAsync();
-                logger.LogInformation(data);
+               // logger.LogInformation(data);
                 var allLines = data.Split("\n");
                 var dataLines = allLines.Skip(1);
                 return tradingDataService.GetPrices(dataLines, listingId, currency);

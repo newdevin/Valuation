@@ -58,7 +58,8 @@ namespace Valuation.Service
                     await smtp.SendMailAsync(mailMessage);
                 }
             }
-            logger.LogInformation($"Email notication sent with subject: {subject} and message : {message}");
+            logger.LogInformation("Email sent");
+            //logger.LogInformation($"Email notication sent with subject: {subject} and message : {message}");
         }
     }
 }
