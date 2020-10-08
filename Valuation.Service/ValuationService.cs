@@ -72,7 +72,7 @@ namespace Valuation.Service
                 day = (onDay.DayOfWeek == DayOfWeek.Saturday) ? onDay.Date.AddDays(-1) : onDay.Date.AddDays(-2);
             }
             var previousDay = day.AddDays(-1).Date;
-            if(previousDay.IsWeekend())
+            if (previousDay.IsWeekend())
             {
                 previousDay = (previousDay.DayOfWeek == DayOfWeek.Saturday) ? previousDay.Date.AddDays(-1) : previousDay.Date.AddDays(-2);
             }
@@ -103,7 +103,9 @@ namespace Valuation.Service
                         PreviousBusinessDayShareValue = x.Previous?.ClosePrice,
                         Currency = (listing != null) ? listing.Currency : null
                     };
-                });
+                })
+                .Where(x=> x.Listing !=null)
+                .ToList();
 
             var listingValuationSummaries2 = currentPrices
                 .GroupJoin(previousPrices, c => c.ListingId, p => p.ListingId,
@@ -119,9 +121,12 @@ namespace Valuation.Service
                         PreviousBusinessDayShareValue = x.Previous?.First()?.ClosePrice,
                         Currency = (listing != null) ? listing.Currency : null
                     };
-                });
+                })
+                .Where(x => x.Listing != null)
+                .ToList();
             var listingValuationSummaries = listingValuationSummaries1
                 .Union(listingValuationSummaries2)
+                .Where(x => x.Listing != null)
                 .Distinct()
                 .ToList();
 
