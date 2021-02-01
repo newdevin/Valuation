@@ -35,8 +35,8 @@ namespace Valuation.WorldTradingData.Service
             var queue = new ConcurrentQueue<EndOfDayPrice>();
             var tasks = listingsWithDate.Select(listingWithDate =>
             {
-                // return Task.Run(async () => 
-                return new Task(async () => //*** This is for AlphaVantage Only ***//
+                 return Task.Run(async () => 
+               // return new Task(async () => //*** This is for AlphaVantage Only ***//
                 {
                     var uri = tradingDataService.GetEndOfDayPriceUri(listingWithDate.Item2?.AddDays(1), listingWithDate.Item1.Symbol, listingWithDate.Item1.Suffix);
                     var endOfDayPrices = await GetEndOfDayPrice(listingWithDate.Item1.Id, uri, listingWithDate.Item1.Currency.Symbol);
@@ -47,16 +47,16 @@ namespace Valuation.WorldTradingData.Service
                 });
             });
 
-            //******* AlphaVantage specific code start********//
-            //AlphaVantage will only allow 5 call per minute
-            foreach (var tsk in tasks)
-            {
-                tsk.RunSynchronously();
-                if (delay.HasValue)
-                    await Task.Delay(TimeSpan.FromSeconds(delay.Value));
-            }
-            //******* AlphaVantage specific code end********//
-            //await Task.WhenAll(tasks);
+            ////******* AlphaVantage specific code start********//
+            ////AlphaVantage will only allow 5 call per minute
+            //foreach (var tsk in tasks)
+            //{
+            //    tsk.RunSynchronously();
+            //    if (delay.HasValue)
+            //        await Task.Delay(TimeSpan.FromSeconds(delay.Value));
+            //}
+            ////******* AlphaVantage specific code end********//
+            await Task.WhenAll(tasks);
             await endOfDayRepository.Save(queue.Select(eodPrice => eodPrice));
         }
         private async Task<IEnumerable<EndOfDayPrice>> GetEndOfDayPrice(int listingId, Uri uri, string currency)

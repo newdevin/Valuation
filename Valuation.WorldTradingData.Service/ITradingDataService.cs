@@ -14,5 +14,4 @@ namespace Valuation.WorldTradingData.Service
         public IEnumerable<CurrencyRate> GetRates(IEnumerable<string> data, string symbol);
         public Quote GetQuote(string data, Listing listing);
     }
-
 }

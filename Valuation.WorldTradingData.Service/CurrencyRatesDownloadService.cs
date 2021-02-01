@@ -32,8 +32,8 @@ namespace Valuation.WorldTradingData.Service
             var queue = new ConcurrentQueue<CurrencyRate>();
             var tasks = currenciesWithDate.Select(c =>
             {
-                //return Task.Run(async () =>
-                return new Task(async () =>
+                return Task.Run(async () =>
+                //return new Task(async () =>
                 {
                     var uri = tradingDataService.GetCurrencyRateUri(c.Item2?.AddDays(1), c.Item1.Symbol);
                     var currencyRates = await GetCurrencyRates(c.Item1.Symbol, uri);
@@ -44,16 +44,16 @@ namespace Valuation.WorldTradingData.Service
                 });
             });
 
-            //******* AlphaVantage specific code start********//
-            //AlphaVantage will only allow 5 call per minute
-            foreach (var tsk in tasks)
-            {
-                tsk.RunSynchronously();
-                if (delay.HasValue)
-                    await Task.Delay(TimeSpan.FromSeconds(delay.Value));
-            }
-            //******* AlphaVantage specific code end********//
-            //await Task.WhenAll(tasks);
+            ////******* AlphaVantage specific code start********//
+            ////AlphaVantage will only allow 5 call per minute
+            //foreach (var tsk in tasks)
+            //{
+            //    tsk.RunSynchronously();
+            //    if (delay.HasValue)
+            //        await Task.Delay(TimeSpan.FromSeconds(delay.Value));
+            //}
+            ////******* AlphaVantage specific code end********//
+            await Task.WhenAll(tasks);
             await currencyRateService.Save(queue.Select(rate => rate));
 
         }

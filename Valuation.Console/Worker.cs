@@ -61,8 +61,8 @@ namespace Valuation.Console
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            monitorPrices = true;
-            MonitorPrices(cancellationToken);
+            //monitorPrices = true;
+            //MonitorPrices(cancellationToken);
             while (!cancellationToken.IsCancellationRequested)
             {
                 try

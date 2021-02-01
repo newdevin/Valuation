@@ -52,6 +52,7 @@ namespace Valuation.Console
 
                 var conStr = hostContext.Configuration.GetConnectionString("PicassoDbConnectionString");
                 var uriString = hostContext.Configuration["AlphaVantage:baseUri"];
+                var uriYahooString = hostContext.Configuration["Yahoo:baseUri"];
                 int.TryParse(hostContext.Configuration["AlphaVantage:delay"], out int delay);
 
                 services.AddDbContext<PicassoDbContext>(options => options.UseSqlServer(conStr), ServiceLifetime.Transient);
@@ -81,8 +82,10 @@ namespace Valuation.Console
                         s.GetService<IHttpClientFactory>(), delay);
                 });
                 services.AddTransient<Repository.Mapper.IObjectMapper, ObjectMapper>(s => new ObjectMapper(s.GetService<IMapper>()));
-                services.AddTransient<ITradingDataService, AlphaVantageDataService>(s =>
-                new AlphaVantageDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
+                //services.AddTransient<ITradingDataService, AlphaVantageDataService>(s =>
+                //new AlphaVantageDataService(new System.Uri(uriString), s.GetService<IApiRepository>()));
+                services.AddTransient<ITradingDataService, YahooFinanceDataService>(s =>
+                new YahooFinanceDataService(uriYahooString));
                 services.AddTransient<IListingService, ListingService>();
                 services.AddTransient<IEndOfDayLogService, EndOfDayLogService>();
                 services.AddTransient<ICurrencyRatesLogService, CurrencyRatesLogService>();
