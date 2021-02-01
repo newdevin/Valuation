@@ -1,4 +1,5 @@
 ﻿using LanguageExt;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,15 @@ namespace Valuation.Service
         private readonly IValuationRepository valuationRepository;
         private readonly IBuyTradeRepository buyTradeRepository;
         private readonly ISellTradeRepository sellTradeRepository;
+        private readonly ILogger<ValuationService> _logger;
 
         public ValuationService(IEndOfDayPriceService endOfDayPriceService,
             ICurrencyRateService currencyRateService,
             IListingService listingService,
             IValuationRepository valuationRepository,
             IBuyTradeRepository buyTradeRepository,
-            ISellTradeRepository sellTradeRepository
+            ISellTradeRepository sellTradeRepository,
+            ILogger<ValuationService> logger
             )
         {
             this.endOfDayPriceService = endOfDayPriceService;
@@ -32,11 +35,14 @@ namespace Valuation.Service
             this.valuationRepository = valuationRepository;
             this.buyTradeRepository = buyTradeRepository;
             this.sellTradeRepository = sellTradeRepository;
+            _logger = logger;
         }
 
         public async Task<PortfolioValuationSummary> GetPortfolioValuation(DateTime onDay)
         {
             var (day, previousDay) = GetCurrentAndPreviousDays(onDay);
+            _logger.LogInformation($"Get valuation for day:{day:yyyy-MM-dd}, previous day :{previousDay:yyyy-MM-dd}");
+
             var (currentSummary, previousSummary) = await GetCurrentAndPreviousSummaries(day, previousDay);
 
             var listingValuationSummaries = await GetListingValuationSummary(day, previousDay);
@@ -101,7 +107,7 @@ namespace Valuation.Service
                         Day = day,
                         CurrentShareValue = x.Current?.First()?.ClosePrice,
                         PreviousBusinessDayShareValue = x.Previous?.ClosePrice,
-                        Currency = (listing != null) ? listing.Currency : null
+                        Currency = listing?.Currency
                     };
                 })
                 .Where(x=> x.Listing !=null)
@@ -119,7 +125,7 @@ namespace Valuation.Service
                         Day = day,
                         CurrentShareValue = x.Current?.ClosePrice,
                         PreviousBusinessDayShareValue = x.Previous?.First()?.ClosePrice,
-                        Currency = (listing != null) ? listing.Currency : null
+                        Currency = listing?.Currency
                     };
                 })
                 .Where(x => x.Listing != null)
@@ -142,25 +148,7 @@ namespace Valuation.Service
         {
             return valuationRepository.GetValuationSummary();
         }
-
-        //public async Task ValuePortfolio(DateTime upToDate)
-        //{
-        //    //throw new NotImplementedException();
-        //    var listingVolumes = await listingService.GetListingVolumes();
-        //    var firstDay = listingVolumes.Min(lv => lv.Day);
-
-        //    var eodPrices = await endOfDayPriceService.GetEndOfDayPriceSince(firstDay);
-        //    var currencyRates = await currencyRateService.GetCurencyRatesSince(firstDay);
-
-        //    var valuations = valuationCalculator.GetValuations(upToDate, listingVolumes, eodPrices, currencyRates);
-        //    var buyTrades = await buyTradeRepository.GetBuyTrades();
-        //    var sellTrades = await sellTradeRepository.GetSellTrades();
-
-        //    var summary = valuationSummaryCalculator.GetSummary(buyTrades, sellTrades, valuations);
-
-        //    await valuationRepository.Save(valuations, summary);
-        //}
-
+               
         public Task ValuePortfolio()
         {
             return valuationRepository.ValuePortfolio();

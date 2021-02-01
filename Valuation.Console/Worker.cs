@@ -67,7 +67,7 @@ namespace Valuation.Console
             {
                 try
                 {
-                    await DoWork(cancellationToken);
+                    await DownloadData(cancellationToken);
                     if (AllDownloadSucceeded() && !await ValuationRunToday())
                     {
                         await RunValuation();
@@ -189,7 +189,7 @@ namespace Valuation.Console
                 return false;
         }
 
-        private async Task DoWork(CancellationToken token)
+        private async Task DownloadData(CancellationToken token)
         {
             if (token.IsCancellationRequested)
                 return;

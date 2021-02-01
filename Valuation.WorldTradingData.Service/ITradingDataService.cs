@@ -12,7 +12,7 @@ namespace Valuation.WorldTradingData.Service
         public Uri GetQuoteUri(string symbol, string suffix);
         public IEnumerable<EndOfDayPrice> GetPrices(IEnumerable<string> data, int listingId, string currency);
         public IEnumerable<CurrencyRate> GetRates(IEnumerable<string> data, string symbol);
-
         public Quote GetQuote(string data, Listing listing);
     }
+
 }
