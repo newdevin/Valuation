@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -18,11 +19,13 @@ namespace Valuation.Repository
     {
         private readonly PicassoDbContext context;
         private readonly IObjectMapper mapper;
+        private readonly ILogger<ValuationRepository> _logger;
 
-        public ValuationRepository(PicassoDbContext context, IObjectMapper mapper)
+        public ValuationRepository(PicassoDbContext context, IObjectMapper mapper, ILogger<ValuationRepository> logger)
         {
             this.context = context;
             this.mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<ListingValuation>> GetValuations(DateTime day)
@@ -37,6 +40,7 @@ namespace Valuation.Repository
 
         public async Task<ValuationSummary> GetValuationSummaryOnDay(DateTime day)
         {
+            _logger.LogInformation($"Getting valuation summary for day: {day:yyyy-MM-dd}");
             var entity = await context.ValuationSummaries
                 .FirstOrDefaultAsync(s => s.Day.Date == day.Date);
 
