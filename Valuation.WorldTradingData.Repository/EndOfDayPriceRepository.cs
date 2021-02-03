@@ -45,7 +45,7 @@ namespace Valuation.Repository
 
         public async Task Save(IEnumerable<EndOfDayPrice> endOfDayPrices)
         {
-
+            
             foreach (var eodPrice in endOfDayPrices)
             {
                 var e = context.EndOfDayPrices.Where(eod => eod.Listing.Id == eodPrice.ListingId && eod.Day == eodPrice.Day).ToList();

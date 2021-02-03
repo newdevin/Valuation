@@ -28,7 +28,7 @@ namespace Valuation.Repository
 
         public async Task<bool> HasRunOn(DateTime day)
         {
-            var entity = await context.EndOfDayPriceLogs.SingleOrDefaultAsync(eod => eod.Day == day.Date);
+            var entity = await context.EndOfDayPriceLogs.FirstOrDefaultAsync(eod => eod.Day == day.Date);
             if (entity != null && !entity.HasErrored)
                 return true;
             return false;

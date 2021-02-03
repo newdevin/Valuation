@@ -115,47 +115,47 @@ namespace Valuation.Console
             return message.ToString();
         }
 
-        private void MonitorPrices(CancellationToken token)
-        {
-            Task.Run(async () =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        if (token.IsCancellationRequested)
-                            return;
-                        if (monitorPrices == false)
-                        {
-                            monitorPricesIsStopped = true;
-                            logger.LogInformation("Monitor prices is now PAUSED");
-                            await Task.Delay(TimeSpan.FromMinutes(1));
-                            continue;
-                        }
-                        monitorPricesIsStopped = false;
-                        logger.LogInformation("Monitor prices is now ACTIVE");
-                        await priceAlertService.CheckAndSendAlert();
-                        monitorPricesIsStopped = true;
-                        await AwaitAsync(quoteDelayInMinutes);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e.ToString());
-                        await AwaitAsync(quoteDelayInMinutes);
-                    }
-                }
-            });
-        }
+        //private void MonitorPrices(CancellationToken token)
+        //{
+        //    Task.Run(async () =>
+        //    {
+        //        while (true)
+        //        {
+        //            try
+        //            {
+        //                if (token.IsCancellationRequested)
+        //                    return;
+        //                if (monitorPrices == false)
+        //                {
+        //                    monitorPricesIsStopped = true;
+        //                    logger.LogInformation("Monitor prices is now PAUSED");
+        //                    await Task.Delay(TimeSpan.FromMinutes(1));
+        //                    continue;
+        //                }
+        //                monitorPricesIsStopped = false;
+        //                logger.LogInformation("Monitor prices is now ACTIVE");
+        //                await priceAlertService.CheckAndSendAlert();
+        //                monitorPricesIsStopped = true;
+        //                await AwaitAsync(quoteDelayInMinutes);
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                logger.LogError(e.ToString());
+        //                await AwaitAsync(quoteDelayInMinutes);
+        //            }
+        //        }
+        //    });
+        //}
 
-        private async Task AwaitAsync(int minutes)
-        {
-            for (int i = 0; i < minutes; i++)
-            {
-                if (monitorPrices == false)
-                    break;
-                await Task.Delay(TimeSpan.FromMinutes(1));
-            }
-        }
+        //private async Task AwaitAsync(int minutes)
+        //{
+        //    for (int i = 0; i < minutes; i++)
+        //    {
+        //        if (monitorPrices == false)
+        //            break;
+        //        await Task.Delay(TimeSpan.FromMinutes(1));
+        //    }
+        //}
 
         private async Task RunValuation()
         {
@@ -201,22 +201,22 @@ namespace Valuation.Console
                 if (!await CurrencyRatesDownloadedToday())
                 {
                     monitorPrices = false;
-                    while (!monitorPricesIsStopped)
-                    {
-                        logger.LogInformation("Waiting for price monitoring to pause");
-                        await Task.Delay(TimeSpan.FromSeconds(15));
-                    }
+                    //while (!monitorPricesIsStopped)
+                    //{
+                    //    logger.LogInformation("Waiting for price monitoring to pause");
+                    //    await Task.Delay(TimeSpan.FromSeconds(15));
+                    //}
                     await DownloadCurrencyRates(today);
                 }
 
                 if (!await EndOfDayPricesDownloadedToday())
                 {
                     monitorPrices = false;
-                    while (!monitorPricesIsStopped)
-                    {
-                        logger.LogInformation("Waiting for price monitoring to pause");
-                        await Task.Delay(TimeSpan.FromSeconds(15));
-                    }
+                    //while (!monitorPricesIsStopped)
+                    //{
+                    //    logger.LogInformation("Waiting for price monitoring to pause");
+                    //    await Task.Delay(TimeSpan.FromSeconds(15));
+                    //}
                     await DownloadEndOfPrices(today);
                 }
 

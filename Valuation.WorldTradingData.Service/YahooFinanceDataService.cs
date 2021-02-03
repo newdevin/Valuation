@@ -106,7 +106,10 @@ namespace Valuation.WorldTradingData.Service
                     }
 
                     return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
-                }).Where(eod => eod.ClosePrice.HasValue);
+                })
+                .Where(eod => eod.ClosePrice.HasValue)
+                .GroupBy(eod=> eod.Day)
+                .Select(grp=> grp.First());
         }
 
         public Quote GetQuote(string data, Listing listing)
