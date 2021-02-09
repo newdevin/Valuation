@@ -66,6 +66,7 @@ namespace Valuation.Repository
 
         public async Task ValuePortfolio()
         {
+            context.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
             await context.Database.ExecuteSqlRawAsync("EXEC dbo.FullValuation");
         }
     }

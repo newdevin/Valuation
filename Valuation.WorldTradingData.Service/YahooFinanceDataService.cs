@@ -51,12 +51,15 @@ namespace Valuation.WorldTradingData.Service
             if (toDate > DateTime.Now.Date)
                 toDate = DateTime.Now.Date;
             var to = (toDate.Date - DateTime.UnixEpoch).TotalSeconds;
-            
+
             string query;
             if (!string.IsNullOrEmpty(suffix))
                 suffix = $".{suffix}";
 
-            query = $"{_baseUri}/v7/finance/download/{symbol}{suffix}?period1={from}&period2={to}&interval=1d&events=history&includeAdjustedClose=true";
+            if (toDate - day < TimeSpan.FromDays(30))
+                query = $"{_baseUri}/v7/finance/download/{symbol}{suffix}?period2={to}&interval=1d&events=history&includeAdjustedClose=true";
+            else
+                query = $"{_baseUri}/v7/finance/download/{symbol}{suffix}?period1={from}&period2={to}&interval=1d&events=history&includeAdjustedClose=true";
 
             return new Uri(query);
         }
@@ -108,8 +111,8 @@ namespace Valuation.WorldTradingData.Service
                     return new EndOfDayPrice(listingId, day, openPrice, closePrice, highPrice, lowPrice, volume);
                 })
                 .Where(eod => eod.ClosePrice.HasValue)
-                .GroupBy(eod=> eod.Day)
-                .Select(grp=> grp.First());
+                .GroupBy(eod => eod.Day)
+                .Select(grp => grp.First());
         }
 
         public Quote GetQuote(string data, Listing listing)
@@ -122,6 +125,6 @@ namespace Valuation.WorldTradingData.Service
             throw new NotImplementedException();
         }
 
-       
+
     }
 }
