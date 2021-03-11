@@ -87,6 +87,7 @@ namespace Valuation.Service
 
         private async Task<IEnumerable<ListingValuationSummary>> GetListingValuationSummary(DateTime day, DateTime previousDay)
         {
+            _logger.LogInformation($"Get sumamries for current:{day:yyyyMMdd} and previous:{previousDay:yyyyMMdd}");
             var currentListingVolumes = await listingService.GetActiveListingVolumesOnDay(day);
             var currentListingIds = currentListingVolumes.Select(lv => lv.Listing.Id);
             var currentPrices = await endOfDayPriceService.GetPrices(day, currentListingIds);
