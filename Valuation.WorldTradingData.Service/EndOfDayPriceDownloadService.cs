@@ -73,6 +73,14 @@ namespace Valuation.WorldTradingData.Service
                 var dataLines = allLines.Skip(1);
                 if (!dataLines.Any())
                     logger.LogWarning($"No data found for {uri}");
+                else
+                {
+                    logger.LogInformation($"found {dataLines.Length()} lines of data for : {uri}");
+                    foreach(var line in dataLines)
+                    {
+                        logger.LogInformation(line);
+                    }
+                }
                 return tradingDataService.GetPrices(dataLines, listingId, currency);
             }
             else

@@ -16,7 +16,7 @@ namespace Valuation.WorldTradingData.Service
         public Uri GetCurrencyRateUri(DateTime? day, string symbol)
         {
             //https://query1.finance.yahoo.com/v7/finance/download/GBPUSD=X?period1=1580586213&period2=1612208613&interval=1d&events=history&includeAdjustedClose=true
-            day ??= DateTime.Now;
+            day ??= DateTime.Now.AddDays(-7).Date;
             var from = (day.Value.Date - DateTime.UnixEpoch).TotalSeconds;
             var toDate = day.Value.AddYears(1);
             if (toDate > DateTime.Now.Date)
@@ -29,6 +29,7 @@ namespace Valuation.WorldTradingData.Service
         }
         public IEnumerable<CurrencyRate> GetRates(IEnumerable<string> data, string symbol)
         {
+            //Date,Open,High,Low,Close,Adj Close, Volume
             return data
                    .Where(d => !string.IsNullOrWhiteSpace(d))
                    .Select(d =>
